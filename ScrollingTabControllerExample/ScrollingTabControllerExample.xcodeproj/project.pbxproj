@@ -1,0 +1,419 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		03675E4C1B97933200FD589A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03675E4B1B97933200FD589A /* AppDelegate.swift */; };
+		03675E4E1B97933200FD589A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03675E4D1B97933200FD589A /* ViewController.swift */; };
+		03675E511B97933200FD589A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 03675E4F1B97933200FD589A /* Main.storyboard */; };
+		03675E531B97933200FD589A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 03675E521B97933200FD589A /* Assets.xcassets */; };
+		03675E561B97933200FD589A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 03675E541B97933200FD589A /* LaunchScreen.storyboard */; };
+		03675E611B97933200FD589A /* ScrollingTabControllerExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03675E601B97933200FD589A /* ScrollingTabControllerExampleTests.swift */; };
+		03675E6D1B97955600FD589A /* ScrollingTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03675E6C1B97955600FD589A /* ScrollingTabController.swift */; settings = {ASSET_TAGS = (); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		03675E5D1B97933200FD589A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 03675E401B97933200FD589A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 03675E471B97933200FD589A;
+			remoteInfo = ScrollingTabControllerExample;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		03675E481B97933200FD589A /* ScrollingTabControllerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScrollingTabControllerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		03675E4B1B97933200FD589A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		03675E4D1B97933200FD589A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		03675E501B97933200FD589A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		03675E521B97933200FD589A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		03675E551B97933200FD589A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		03675E571B97933200FD589A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		03675E5C1B97933200FD589A /* ScrollingTabControllerExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScrollingTabControllerExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		03675E601B97933200FD589A /* ScrollingTabControllerExampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingTabControllerExampleTests.swift; sourceTree = "<group>"; };
+		03675E621B97933200FD589A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		03675E6C1B97955600FD589A /* ScrollingTabController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollingTabController.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		03675E451B97933200FD589A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		03675E591B97933200FD589A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		03675E3F1B97933200FD589A = {
+			isa = PBXGroup;
+			children = (
+				03675E6B1B97944500FD589A /* ScrollingTabController */,
+				03675E4A1B97933200FD589A /* ScrollingTabControllerExample */,
+				03675E5F1B97933200FD589A /* ScrollingTabControllerExampleTests */,
+				03675E491B97933200FD589A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		03675E491B97933200FD589A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				03675E481B97933200FD589A /* ScrollingTabControllerExample.app */,
+				03675E5C1B97933200FD589A /* ScrollingTabControllerExampleTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		03675E4A1B97933200FD589A /* ScrollingTabControllerExample */ = {
+			isa = PBXGroup;
+			children = (
+				03675E4B1B97933200FD589A /* AppDelegate.swift */,
+				03675E4D1B97933200FD589A /* ViewController.swift */,
+				03675E4F1B97933200FD589A /* Main.storyboard */,
+				03675E521B97933200FD589A /* Assets.xcassets */,
+				03675E541B97933200FD589A /* LaunchScreen.storyboard */,
+				03675E571B97933200FD589A /* Info.plist */,
+			);
+			path = ScrollingTabControllerExample;
+			sourceTree = "<group>";
+		};
+		03675E5F1B97933200FD589A /* ScrollingTabControllerExampleTests */ = {
+			isa = PBXGroup;
+			children = (
+				03675E601B97933200FD589A /* ScrollingTabControllerExampleTests.swift */,
+				03675E621B97933200FD589A /* Info.plist */,
+			);
+			path = ScrollingTabControllerExampleTests;
+			sourceTree = "<group>";
+		};
+		03675E6B1B97944500FD589A /* ScrollingTabController */ = {
+			isa = PBXGroup;
+			children = (
+				03675E6C1B97955600FD589A /* ScrollingTabController.swift */,
+			);
+			name = ScrollingTabController;
+			path = ../ScrollingTabController;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		03675E471B97933200FD589A /* ScrollingTabControllerExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 03675E651B97933200FD589A /* Build configuration list for PBXNativeTarget "ScrollingTabControllerExample" */;
+			buildPhases = (
+				03675E441B97933200FD589A /* Sources */,
+				03675E451B97933200FD589A /* Frameworks */,
+				03675E461B97933200FD589A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ScrollingTabControllerExample;
+			productName = ScrollingTabControllerExample;
+			productReference = 03675E481B97933200FD589A /* ScrollingTabControllerExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		03675E5B1B97933200FD589A /* ScrollingTabControllerExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 03675E681B97933200FD589A /* Build configuration list for PBXNativeTarget "ScrollingTabControllerExampleTests" */;
+			buildPhases = (
+				03675E581B97933200FD589A /* Sources */,
+				03675E591B97933200FD589A /* Frameworks */,
+				03675E5A1B97933200FD589A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				03675E5E1B97933200FD589A /* PBXTargetDependency */,
+			);
+			name = ScrollingTabControllerExampleTests;
+			productName = ScrollingTabControllerExampleTests;
+			productReference = 03675E5C1B97933200FD589A /* ScrollingTabControllerExampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		03675E401B97933200FD589A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0700;
+				ORGANIZATIONNAME = "WillowTree, Inc.";
+				TargetAttributes = {
+					03675E471B97933200FD589A = {
+						CreatedOnToolsVersion = 7.0;
+					};
+					03675E5B1B97933200FD589A = {
+						CreatedOnToolsVersion = 7.0;
+						TestTargetID = 03675E471B97933200FD589A;
+					};
+				};
+			};
+			buildConfigurationList = 03675E431B97933200FD589A /* Build configuration list for PBXProject "ScrollingTabControllerExample" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 03675E3F1B97933200FD589A;
+			productRefGroup = 03675E491B97933200FD589A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				03675E471B97933200FD589A /* ScrollingTabControllerExample */,
+				03675E5B1B97933200FD589A /* ScrollingTabControllerExampleTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		03675E461B97933200FD589A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				03675E561B97933200FD589A /* LaunchScreen.storyboard in Resources */,
+				03675E531B97933200FD589A /* Assets.xcassets in Resources */,
+				03675E511B97933200FD589A /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		03675E5A1B97933200FD589A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		03675E441B97933200FD589A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				03675E4E1B97933200FD589A /* ViewController.swift in Sources */,
+				03675E4C1B97933200FD589A /* AppDelegate.swift in Sources */,
+				03675E6D1B97955600FD589A /* ScrollingTabController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		03675E581B97933200FD589A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				03675E611B97933200FD589A /* ScrollingTabControllerExampleTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		03675E5E1B97933200FD589A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 03675E471B97933200FD589A /* ScrollingTabControllerExample */;
+			targetProxy = 03675E5D1B97933200FD589A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		03675E4F1B97933200FD589A /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				03675E501B97933200FD589A /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		03675E541B97933200FD589A /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				03675E551B97933200FD589A /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		03675E631B97933200FD589A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		03675E641B97933200FD589A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		03675E661B97933200FD589A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = ScrollingTabControllerExample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.willowtreeapps.ScrollingTabControllerExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		03675E671B97933200FD589A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = ScrollingTabControllerExample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.willowtreeapps.ScrollingTabControllerExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		03675E691B97933200FD589A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = ScrollingTabControllerExampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.willowtreeapps.ScrollingTabControllerExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ScrollingTabControllerExample.app/ScrollingTabControllerExample";
+			};
+			name = Debug;
+		};
+		03675E6A1B97933200FD589A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = ScrollingTabControllerExampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.willowtreeapps.ScrollingTabControllerExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ScrollingTabControllerExample.app/ScrollingTabControllerExample";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		03675E431B97933200FD589A /* Build configuration list for PBXProject "ScrollingTabControllerExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				03675E631B97933200FD589A /* Debug */,
+				03675E641B97933200FD589A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		03675E651B97933200FD589A /* Build configuration list for PBXNativeTarget "ScrollingTabControllerExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				03675E661B97933200FD589A /* Debug */,
+				03675E671B97933200FD589A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		03675E681B97933200FD589A /* Build configuration list for PBXNativeTarget "ScrollingTabControllerExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				03675E691B97933200FD589A /* Debug */,
+				03675E6A1B97933200FD589A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 03675E401B97933200FD589A /* Project object */;
+}
