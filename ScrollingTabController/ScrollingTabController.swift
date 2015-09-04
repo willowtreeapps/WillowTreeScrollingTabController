@@ -93,7 +93,7 @@ class ScrollingTabController: UIViewController, UICollectionViewDataSource, UICo
         self.navigationItem
         self.collectionView = UICollectionView(frame: self.view.bounds, collectionViewLayout: self.collectionViewLayout)
         
-        self.collectionView.registerClass(ViewControllerCell.classForCoder(), forCellWithReuseIdentifier: "Cell")
+        self.collectionView.registerClass(ScrollingViewControllerCell.classForCoder(), forCellWithReuseIdentifier: "Cell")
         self.collectionView.dataSource = self
         self.collectionView.delegate = self
         self.collectionView.pagingEnabled = true
@@ -150,14 +150,14 @@ class ScrollingTabController: UIViewController, UICollectionViewDataSource, UICo
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("Cell", forIndexPath: indexPath) as! ViewControllerCell
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("Cell", forIndexPath: indexPath) as! ScrollingViewControllerCell
         
         let viewController = self.childControllers[indexPath.item]
         
-        if cell.myViewController == nil || !(cell.myViewController === viewController) {
+        if cell.viewController == nil || !(cell.viewController === viewController) {
             
             cell.parentViewController = self
-            cell.myViewController = viewController
+            cell.viewController = viewController
             
             if let snapshot = self.viewControllerCache.objectForKey(indexPath) as? UIView {
                 cell.snapshotView = snapshot
@@ -173,7 +173,7 @@ class ScrollingTabController: UIViewController, UICollectionViewDataSource, UICo
         {
             scrollingStarted = true
             for indexPath in self.collectionView.indexPathsForVisibleItems() {
-                if let vcCell = self.collectionView.cellForItemAtIndexPath(indexPath) as? ViewControllerCell {
+                if let vcCell = self.collectionView.cellForItemAtIndexPath(indexPath) as? ScrollingViewControllerCell {
                     let snapshot = vcCell.snapshotViewAfterScreenUpdates(false)
                     self.viewControllerCache.setObject(snapshot, forKey: indexPath)
                 }
@@ -184,7 +184,7 @@ class ScrollingTabController: UIViewController, UICollectionViewDataSource, UICo
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         scrollingStarted = false
         for cell in self.collectionView.visibleCells() {
-            if let vcCell = cell as? ViewControllerCell {
+            if let vcCell = cell as? ScrollingViewControllerCell {
                 vcCell.loadViewController()
             }
         }
@@ -204,54 +204,6 @@ class ScrollingTabController: UIViewController, UICollectionViewDataSource, UICo
     }
     */
 }
-
-class ViewControllerCell: UICollectionViewCell {
-    weak var myViewController: UIViewController?
-    weak var parentViewController: UIViewController?
-    
-    weak var snapshotView: UIView? {
-        didSet {
-            if self.snapshotView != nil {
-                self.contentView.addSubview(self.snapshotView!)
-            }
-        }
-    }
-//    weak var snapshotView?: UIView {
-//        didSet
-//    }
-    
-    func loadViewController() {
-        guard let viewController = self.myViewController else {
-            return
-        }
-        
-        viewController.willMoveToParentViewController(self.parentViewController)
-        self.parentViewController?.addChildViewController(viewController)
-        
-        self.contentView.addSubview(viewController.view)
-        self.snapshotView?.removeFromSuperview()
-        viewController.view.frame = self.bounds
-        viewController.didMoveToParentViewController(self.parentViewController)
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        self.layer.borderColor = UIColor.redColor().CGColor
-        self.layer.borderWidth = 1.0
-        if let viewController = self.myViewController {
-            viewController.willMoveToParentViewController(nil)
-            viewController.view.removeFromSuperview()
-            viewController.removeFromParentViewController()
-            self.myViewController = nil
-        }
-        
-        if let snapshot = self.snapshotView {
-            snapshot.removeFromSuperview()
-            self.snapshotView = nil
-        }
-    }
-}
-
 
 class TestingViewController: UIViewController {
     
