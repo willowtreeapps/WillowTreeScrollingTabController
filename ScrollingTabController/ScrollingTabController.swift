@@ -78,7 +78,15 @@ class TabFlowController: UICollectionViewFlowLayout {
 //    }
 
 }
-class ScrollingTabController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+
+protocol ScrollingTabControllerDataSource {
+    func numberOfItemsInController(controller: ScrollingTabController) -> Int
+    func viewControllerAtIndexForController(controller: ScrollingTabController, index: Int) -> UIViewController?
+}
+
+public class ScrollingTabController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    
+    public var tabView = ScrollingTabView()
     
     var viewControllerCache = NSCache()
     var collectionView: UICollectionView!
@@ -86,7 +94,7 @@ class ScrollingTabController: UIViewController, UICollectionViewDataSource, UICo
     var childControllers = [UIViewController]()
     var scrollingStarted = false
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
 
         self.buildViewControllers()
@@ -97,10 +105,22 @@ class ScrollingTabController: UIViewController, UICollectionViewDataSource, UICo
         self.collectionView.dataSource = self
         self.collectionView.delegate = self
         self.collectionView.pagingEnabled = true
+        self.collectionView.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(self.collectionView)
         
+        self.tabView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(self.tabView)
+        var tabConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|[tabBar]|", options: NSLayoutFormatOptions.init(rawValue: 0), metrics: nil, views: ["tabBar": self.tabView])
+
+        tabConstraints.appendContentsOf(NSLayoutConstraint.constraintsWithVisualFormat("V:|[tabBar]", options: NSLayoutFormatOptions.init(rawValue: 0), metrics: nil, views: ["tabBar": self.tabView]))
+        let height = NSLayoutConstraint(item: self.tabView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 44.0)
+        self.tabView.addConstraint(height)
+        self.view.addConstraints(tabConstraints)
+
+
+        
         let horizontalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|[collectionView]|", options: NSLayoutFormatOptions.init(rawValue: 0), metrics: nil, views: ["collectionView": self.collectionView])
-        let verticalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("V:|[collectionView]|", options:  NSLayoutFormatOptions.init(rawValue: 0), metrics: nil, views: ["collectionView": self.collectionView])
+        let verticalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("V:[tabBar][collectionView]|", options:  NSLayoutFormatOptions.init(rawValue: 0), metrics: nil, views: ["tabBar": self.tabView, "collectionView": self.collectionView])
 
         self.view.addConstraints(horizontalConstraints)
         self.view.addConstraints(verticalConstraints)
@@ -111,7 +131,7 @@ class ScrollingTabController: UIViewController, UICollectionViewDataSource, UICo
         // Do any additional setup after loading the view.
     }
 
-    override func didReceiveMemoryWarning() {
+    public override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
@@ -141,15 +161,15 @@ class ScrollingTabController: UIViewController, UICollectionViewDataSource, UICo
         }
     }
     
-    func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    public func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         return 1
     }
     
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.childControllers.count
     }
     
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+    public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("Cell", forIndexPath: indexPath) as! ScrollingViewControllerCell
         
         let viewController = self.childControllers[indexPath.item]
@@ -168,7 +188,7 @@ class ScrollingTabController: UIViewController, UICollectionViewDataSource, UICo
         return cell
     }
     
-    func scrollViewDidScroll(scrollView: UIScrollView) {
+    public func scrollViewDidScroll(scrollView: UIScrollView) {
         if (!scrollingStarted)
         {
             scrollingStarted = true
@@ -181,7 +201,7 @@ class ScrollingTabController: UIViewController, UICollectionViewDataSource, UICo
         }
     }
     
-    func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+    public func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         scrollingStarted = false
         for cell in self.collectionView.visibleCells() {
             if let vcCell = cell as? ScrollingViewControllerCell {
@@ -190,7 +210,7 @@ class ScrollingTabController: UIViewController, UICollectionViewDataSource, UICo
         }
     }
     
-    func scrollViewDidEndScrollingAnimation(scrollView: UIScrollView) {
+    public func scrollViewDidEndScrollingAnimation(scrollView: UIScrollView) {
         scrollingStarted = false
     }
     

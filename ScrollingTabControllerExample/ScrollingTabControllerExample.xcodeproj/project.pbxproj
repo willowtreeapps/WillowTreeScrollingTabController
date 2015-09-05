@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		035A4E391B99EA9900FA4A62 /* ScrollingViewControllerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035A4E381B99EA9900FA4A62 /* ScrollingViewControllerCell.swift */; settings = {ASSET_TAGS = (); }; };
+		035A4E3B1B99F0C600FA4A62 /* ScrollingTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035A4E3A1B99F0C600FA4A62 /* ScrollingTabView.swift */; settings = {ASSET_TAGS = (); }; };
+		035A4E3D1B99F11100FA4A62 /* ScrollingTabCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035A4E3C1B99F11100FA4A62 /* ScrollingTabCell.swift */; settings = {ASSET_TAGS = (); }; };
 		03675E4C1B97933200FD589A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03675E4B1B97933200FD589A /* AppDelegate.swift */; };
 		03675E4E1B97933200FD589A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03675E4D1B97933200FD589A /* ViewController.swift */; };
 		03675E511B97933200FD589A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 03675E4F1B97933200FD589A /* Main.storyboard */; };
@@ -29,6 +31,8 @@
 
 /* Begin PBXFileReference section */
 		035A4E381B99EA9900FA4A62 /* ScrollingViewControllerCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollingViewControllerCell.swift; sourceTree = "<group>"; };
+		035A4E3A1B99F0C600FA4A62 /* ScrollingTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollingTabView.swift; sourceTree = "<group>"; };
+		035A4E3C1B99F11100FA4A62 /* ScrollingTabCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollingTabCell.swift; sourceTree = "<group>"; };
 		03675E481B97933200FD589A /* ScrollingTabControllerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScrollingTabControllerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		03675E4B1B97933200FD589A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		03675E4D1B97933200FD589A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -105,6 +109,8 @@
 			isa = PBXGroup;
 			children = (
 				03675E6C1B97955600FD589A /* ScrollingTabController.swift */,
+				035A4E3A1B99F0C600FA4A62 /* ScrollingTabView.swift */,
+				035A4E3C1B99F11100FA4A62 /* ScrollingTabCell.swift */,
 				035A4E381B99EA9900FA4A62 /* ScrollingViewControllerCell.swift */,
 			);
 			name = ScrollingTabController;
@@ -212,6 +218,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				035A4E391B99EA9900FA4A62 /* ScrollingViewControllerCell.swift in Sources */,
+				035A4E3D1B99F11100FA4A62 /* ScrollingTabCell.swift in Sources */,
+				035A4E3B1B99F0C600FA4A62 /* ScrollingTabView.swift in Sources */,
 				03675E4E1B97933200FD589A /* ViewController.swift in Sources */,
 				03675E4C1B97933200FD589A /* AppDelegate.swift in Sources */,
 				03675E6D1B97955600FD589A /* ScrollingTabController.swift in Sources */,
