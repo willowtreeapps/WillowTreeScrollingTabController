@@ -29,7 +29,7 @@ public class ScrollingTabViewFlowLayout: UICollectionViewFlowLayout {
     }
 }
 
-public class ScrollingTabView: UICollectionView, UICollectionViewDataSource, UICollectionViewDelegate {
+public class ScrollingTabView: UICollectionView {
     
     public convenience init()
     {
@@ -48,27 +48,9 @@ public class ScrollingTabView: UICollectionView, UICollectionViewDataSource, UIC
     }
     
     func setup() {
-        self.dataSource = self
-        self.delegate = self
         self.registerClass(ScrollingTabCell.classForCoder(), forCellWithReuseIdentifier: "TabCell")
         
         self.showsHorizontalScrollIndicator = false
         self.showsVerticalScrollIndicator = false
-    }
-    
-    public func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
-        return 1
-    }
-    
-    public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 100
-    }
-    
-    public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("TabCell", forIndexPath: indexPath) as! ScrollingTabCell
-        
-        cell.titleLabel.text = "item \(indexPath.item)"
-        
-        return cell
     }
 }
