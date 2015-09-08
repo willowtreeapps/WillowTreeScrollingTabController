@@ -97,7 +97,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     var viewControllerCache = NSCache()
     var tabControllersView: UIScrollView!
     var collectionViewLayout = TabFlowController()
-    var scrollingStarted = false
+    var jumpScroll = false
 
     var currentPage: Int = 0
     var updatingCurrentPage = true
@@ -115,6 +115,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         super.viewDidLoad()
         
         self.tabControllersView = UIScrollView()
+        self.automaticallyAdjustsScrollViewInsets = false
         
         self.tabControllersView.delegate = self
         self.tabControllersView.pagingEnabled = true
@@ -203,8 +204,6 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     func lazyLoad(index: Int) {
         guard inRange(index) else { return }
         
-//        self.logger?.trace("Lazy evaluating tab \(index); loaded \(loadedPages); current: \(currentPage)")
-        
         if shouldLoadTab(index) {
             loadTab(index)
         } else {
@@ -217,15 +216,15 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         guard shouldLoadTab(index) else { return }
         guard !loadedPages.contains(index) else { return }
         
-//        logger?.trace("Loading tab \(index)")
-        
+        debugPrint("Loading tag \(index) number of children \(self.childViewControllers.count)")
         switch index {
         case loadedPages.start - 1:
             loadedPages = HalfOpenInterval<Int>(index, loadedPages.end)
         case loadedPages.end:
             loadedPages = HalfOpenInterval<Int>(loadedPages.start, index + 1)
         default:
-            fatalError("Should not be able to load tabs not adjacent to loaded tabs")
+            print("Would have crashed load")
+//            fatalError("Should not be able to load tabs not adjacent to loaded tabs")
         }
         
         let container = items[index].container
@@ -248,21 +247,37 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         guard !shouldLoadTab(index) else { return }
         guard loadedPages.contains(index) else { return }
         
-//        logger?.trace("Unloading tab \(index)")
-        
+        print("Unload tab at index \(index)")
         switch index {
         case loadedPages.start:
             loadedPages = HalfOpenInterval<Int>(index + 1, loadedPages.end)
         case loadedPages.end - 1:
             loadedPages = HalfOpenInterval<Int>(loadedPages.start, index)
         default:
-            fatalError("Should not be able to unload tabs not on the edges of loaded range")
+            print("Would have crashed unload")
+//            fatalError("Should not be able to unload tabs not on the edges of loaded range")
         }
         
         let child = items[index].controller
         child.willMoveToParentViewController(nil)
         child.view.removeFromSuperview()
         child.removeFromParentViewController()
+    }
+    
+    func unloadTabs() {
+        for index in 0..<items.count {
+            print("Index \(index)")
+            if !shouldLoadTab(index) {
+                print("Not in range")
+                let child = items[index].controller
+                if child.parentViewController != nil {
+                    print("REmove child")
+                    child.willMoveToParentViewController(nil)
+                    child.view.removeFromSuperview()
+                    child.removeFromParentViewController()
+                }
+            }
+        }
     }
     
     func reloadData() {
@@ -354,26 +369,33 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
 //        scrollingStarted = false
 //    }
     
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-    
     override public func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
         
         updatingCurrentPage = false
-//        self.tabsCollectionView.collectionViewLayout.invalidateLayout()
+
         coordinator.animateAlongsideTransition(nil, completion: { context in
             self.updatingCurrentPage = true
         })
     }
     
+    func checkAndLoadPages() {
+        let width = tabControllersView.frame.size.width
+        let page = Int(tabControllersView.contentOffset.x / width)
+        if page != currentPage {
+            currentPage = page
+            
+            self.tabView.selectItemAtIndexPath(NSIndexPath(forItem: currentPage, inSection: 0), animated: true, scrollPosition: .Left)
+            
+            for offset in 0...(numToPreload + 1) {
+                lazyLoad(page - offset)
+                if offset > 0 {
+                    lazyLoad(page + offset)
+                }
+            }
+        }
+
+    }
     public func scrollViewDidScroll(scrollView: UIScrollView) {
         guard scrollView == tabControllersView else {
             return
@@ -383,22 +405,33 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
             return
         }
         
-        let width = tabControllersView.frame.size.width
-        let page = Int(tabControllersView.contentOffset.x / width)
-        if page != currentPage {
-            currentPage = page
-            
-            for offset in 0...(numToPreload + 1) {
-                lazyLoad(page - offset)
-                if offset > 0 {
-                    lazyLoad(page + offset)
-                }
-            }
+        if scrollView.tracking {
+            self.checkAndLoadPages()
         }
+    }
+    
+    public func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            self.checkAndLoadPages()
+        }
+    }
+    
+    public func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+        self.checkAndLoadPages()
+    }
+    
+    public func scrollViewDidEndScrollingAnimation(scrollView: UIScrollView) {
+        debugPrint("Ended scrolling animation")
+        loadedPages = HalfOpenInterval<Int>(currentPage, currentPage)
+        lazyLoad(currentPage)
+        self.jumpScroll = false
+        unloadTabs()
     }
     
     func scrollToPage(index: Int, animate: Bool) {
         let rect = CGRectMake(CGFloat(index) * tabControllersView.bounds.width, 0, tabControllersView.bounds.width, tabControllersView.bounds.height)
+        jumpScroll = true
+        currentPage = index
         tabControllersView.setContentOffset(rect.origin, animated: true)
     }
     

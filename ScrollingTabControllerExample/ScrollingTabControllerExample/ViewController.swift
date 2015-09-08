@@ -36,6 +36,7 @@ class ViewController: ScrollingTabController, ScrollingTabControllerDataSource {
                 color = UIColor.whiteColor()
             }
             viewController.view.backgroundColor = color
+            viewController.itemTextLabel.text = "\(i)"
             
             self.viewControllers.append(viewController)
         }
@@ -43,6 +44,21 @@ class ViewController: ScrollingTabController, ScrollingTabControllerDataSource {
 }
 
 class TestingViewController: UIViewController {
+    
+    var itemTextLabel = UILabel(frame: CGRectZero)
+
+    override func viewDidLoad() {
+        self.view.addSubview(itemTextLabel)
+        
+        self.itemTextLabel.backgroundColor = UIColor(white: 1.0, alpha: 0.7)
+        self.itemTextLabel.textColor = UIColor.blackColor()
+        self.itemTextLabel.font = UIFont.systemFontOfSize(100)
+        self.itemTextLabel.translatesAutoresizingMaskIntoConstraints = false
+        let horizontal = NSLayoutConstraint(item: itemTextLabel, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1.0, constant: 0.0)
+        let vertical = NSLayoutConstraint(item: itemTextLabel, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1.0, constant: 0.0)
+        
+        NSLayoutConstraint.activateConstraints([horizontal, vertical])
+    }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
