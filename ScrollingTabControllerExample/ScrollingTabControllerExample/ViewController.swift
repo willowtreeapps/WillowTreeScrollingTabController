@@ -15,6 +15,7 @@ class ViewController: ScrollingTabController, ScrollingTabControllerDataSource {
         
         self.buildViewControllers()
         self.dataSource = self
+//        self.sizeTabItemsToFit = true
     }
     
     func buildViewControllers() {

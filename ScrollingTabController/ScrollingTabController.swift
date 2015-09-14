@@ -10,15 +10,21 @@ import UIKit
 
 public protocol ScrollingTabControllerDataSource: class {
     
+    func numberOfItemsInTabView(tabView: ScrollingTabController) -> Int?
+    
     func tabView(tabView: ScrollingTabController, viewControllerAtIndex index: Int) -> UIViewController?
     
     func tabView(tabView: ScrollingTabController, configureTitleCell cell: UICollectionViewCell, atIndex index: Int) -> UICollectionViewCell?
     
-    func tabView(tabView: ScrollingTabController, widthForCellAtIndex index: Int) -> CGFloat
+    func tabView(tabView: ScrollingTabController, widthForCellAtIndex index: Int) -> CGFloat?
 }
 
 extension ScrollingTabControllerDataSource {
     
+    func numberOfItemsInTabView(tabView: ScrollingTabController) -> Int? {
+        return nil;
+    }
+    
     func tabView(tabView: ScrollingTabController, viewControllerAtIndex index: Int) -> UIViewController?
     {
         return nil
@@ -29,9 +35,9 @@ extension ScrollingTabControllerDataSource {
         return nil
     }
     
-    func tabView(tabView: ScrollingTabController, widthForCellAtIndex index: Int) -> CGFloat
+    func tabView(tabView: ScrollingTabController, widthForCellAtIndex index: Int) -> CGFloat?
     {
-        return 100.0
+        return nil
     }
 
 }
@@ -48,6 +54,12 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     }
     
     @IBInspectable public weak var dataSource: ScrollingTabControllerDataSource?
+    
+    public var sizeTabItemsToFit: Bool = false {
+        didSet {
+            self.tabView.sizeTabsToFitWidth = sizeTabItemsToFit
+        }
+    }
     
     var viewControllerCache = NSCache()
     var tabControllersView: UIScrollView!
@@ -100,11 +112,22 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         
         self.configureViewControllers()
         reloadData()
-        
+
         self.loadTab(0)
-        // Do any additional setup after loading the view.
     }
     
+    override public func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        if self.sizeTabItemsToFit {
+            self.tabView.calculateItemSizeToFitWidth(self.view.frame.size.width)
+        }
+
+    }
+    
+    override public func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        self.tabView.panToPercentage(0)
+    }
     override public func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         tabControllersView.contentOffset = CGPointMake(CGFloat(currentPage) * tabControllersView.bounds.width, 0)
     }
@@ -247,6 +270,11 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     }
     
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        
+        if let count = self.dataSource?.numberOfItemsInTabView(self) {
+            return count
+        }
+        
         return self.items.count
     }
     
@@ -270,6 +298,10 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         if let width = self.dataSource?.tabView(self, widthForCellAtIndex: indexPath.item) {
             return CGSizeMake(width, height)
         } else {
+            if let flowLayout = collectionViewLayout as? UICollectionViewFlowLayout {
+                return flowLayout.itemSize
+            }
+            
             return CGSizeMake(100.0, height)
         }
     }
@@ -292,7 +324,12 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         
         updatingCurrentPage = false
 
-        coordinator.animateAlongsideTransition(nil, completion: { context in
+        coordinator.animateAlongsideTransition({ _ in
+            if self.sizeTabItemsToFit {
+                self.tabView.calculateItemSizeToFitWidth(size.width)
+            }
+
+            }, completion: { context in
             self.updatingCurrentPage = true
             let percentage = self.tabControllersView.contentOffset.x / self.tabControllersView.contentSize.width;
             self.tabView.panToPercentage(percentage)
@@ -304,9 +341,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         let page = Int(tabControllersView.contentOffset.x / width)
         if page != currentPage {
             currentPage = page
-            
-//            self.tabView.selectItemAtIndexPath(NSIndexPath(forItem: currentPage, inSection: 0), animated: false, scrollPosition: .None)
-//            self.tabView.scrollToItemAtIndexPath(NSIndexPath(forItem: currentPage, inSection: 0), atScrollPosition: .CenteredHorizontally, animated: true)
+
             for offset in 0...(numToPreload + 1) {
                 lazyLoad(page - offset)
                 if offset > 0 {

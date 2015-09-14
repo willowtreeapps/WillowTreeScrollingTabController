@@ -116,10 +116,20 @@ public class ScrollingTabView: UIView {
     
     public var selectionIndicatorEdgeInsets: UIEdgeInsets = UIEdgeInsetsMake(0, 5, 0, 5)
     
+    public var sizeTabsToFitWidth: Bool = false {
+        didSet {
+            if (sizeTabsToFitWidth) {
+                self.calculateItemSizeToFitWidth(self.frame.width)
+            }
+        }
+    }
+    
     var selectionIndicatorLeadingConstraint: NSLayoutConstraint!
     var selectionIndicatorBottomConstraint: NSLayoutConstraint!
     var selectionIndicatorHeightConstraint: NSLayoutConstraint!
     var selectionIndicatorWidthConstraint: NSLayoutConstraint!
+    
+    private var lastPercentage: CGFloat = 0
     
     override public init(frame: CGRect) {
         super.init(frame: frame)
@@ -170,6 +180,8 @@ public class ScrollingTabView: UIView {
     }
     
     public func panToPercentage(percentage: CGFloat) {
+        
+        lastPercentage = percentage
         
         let tabCount = self.collectionView.numberOfItemsInSection(0)
         let percentageInterval = CGFloat(1.0 / Double(tabCount))
@@ -236,5 +248,14 @@ public class ScrollingTabView: UIView {
         }
     }
     
-
+    func calculateItemSizeToFitWidth(width: CGFloat) {
+        let numberOfItems = self.collectionView.numberOfItemsInSection(0)
+        
+        if numberOfItems > 0 {
+            if let layout = self.collectionView.collectionViewLayout as? ScrollingTabViewFlowLayout {
+                layout.itemSize = CGSizeMake(width / CGFloat(numberOfItems), layout.itemSize.height)
+                layout.invalidateLayout()
+            }
+        }
+    }
 }
