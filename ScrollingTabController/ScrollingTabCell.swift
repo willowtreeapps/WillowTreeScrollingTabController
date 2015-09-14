@@ -11,7 +11,6 @@ import UIKit
 class ScrollingTabCell: UICollectionViewCell {
     
     var titleLabel: UILabel!
-    var backgroundImageView: UIImageView!
     
     override var selected: Bool {
         didSet {
@@ -40,11 +39,11 @@ class ScrollingTabCell: UICollectionViewCell {
         self.titleLabel.textAlignment = .Center
         self.contentView.addSubview(self.titleLabel)
         
-        let horizontalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|[view]|",
+        let horizontalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|-[view]-|",
             options: NSLayoutFormatOptions(rawValue:0),
             metrics: nil,
             views: ["view": self.titleLabel])
-        let verticalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("V:|[view]|",
+        let verticalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("V:|-[view]-|",
             options: NSLayoutFormatOptions(rawValue:0),
             metrics: nil,
             views: ["view": self.titleLabel])
@@ -52,5 +51,4 @@ class ScrollingTabCell: UICollectionViewCell {
         self.contentView.addConstraints(horizontalConstraints)
         self.contentView.addConstraints(verticalConstraints)
     }
-    
 }

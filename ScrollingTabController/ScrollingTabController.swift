@@ -8,46 +8,13 @@
 
 import UIKit
 
-class TabFlowController: UICollectionViewFlowLayout {
-
-    override init() {
-        super.init()
-        self.minimumInteritemSpacing = 0
-        self.minimumLineSpacing = 0
-    }
+@objc public protocol ScrollingTabControllerDataSource {
     
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        self.minimumInteritemSpacing = 0
-        self.minimumLineSpacing = 0
-        
-    }
-    override func targetContentOffsetForProposedContentOffset(proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
-        guard let collectionView = self.collectionView else {
-            return proposedContentOffset
-        }
-        
-        var offset = CGFloat(MAXFLOAT)
-        let halfWidth = CGRectGetWidth(collectionView.bounds) / 2.0
-        let horizontalCenter = proposedContentOffset.x + halfWidth
-        
-        let targetRect = CGRectMake(proposedContentOffset.x, 0.0, collectionView.bounds.size.width, collectionView.bounds.size.height)
-        
-        let layoutAttributes = self.layoutAttributesForElementsInRect(targetRect)
-        
-            for attributes in (layoutAttributes ?? []) {
-                let itemHorizontalCenter = attributes.center.x
-                if abs(itemHorizontalCenter - horizontalCenter) < abs(offset) {
-                    offset = itemHorizontalCenter - horizontalCenter
-                }
-            }
-        
-        let targetPoint = CGPointMake(min(collectionView.contentSize.width - collectionView.frame.size.width, max(0, proposedContentOffset.x + offset)), 0)
-        return targetPoint
-    }
-}
-
-protocol ScrollingTabControllerDataSource {
+    optional func tabView(tabView: ScrollingTabController, viewControllerAtIndex index: Int) -> UIViewController
+    
+    optional func tabView(tabView: ScrollingTabController, configureTitleCell cell: UICollectionViewCell, atIndex index: Int) -> UICollectionViewCell
+    
+    optional func tabView(tabView: ScrollingTabController, widthForCellAtIndex index: Int) -> CGFloat
 }
 
 public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate {
@@ -61,6 +28,8 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
             }
         }
     }
+    
+    @IBInspectable public weak var dataSource: ScrollingTabControllerDataSource?
     
     var viewControllerCache = NSCache()
     var tabControllersView: UIScrollView!
@@ -99,8 +68,6 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         self.tabView.addConstraint(height)
         self.view.addConstraints(tabConstraints)
 
-
-        
         let horizontalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|[tabControllersView]|", options: NSLayoutFormatOptions.init(rawValue: 0), metrics: nil, views: ["tabControllersView": self.tabControllersView])
         let verticalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("V:[tabBar][tabControllersView]|", options:  NSLayoutFormatOptions.init(rawValue: 0), metrics: nil, views: ["tabBar": self.tabView, "tabControllersView": self.tabControllersView])
 
@@ -270,7 +237,12 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("TabCell", forIndexPath: indexPath) as! ScrollingTabCell
         
-        cell.titleLabel.text = "item \(indexPath.item + 1)"
+        let configuredCell = self.dataSource?.tabView?(self, configureTitleCell: cell, atIndex: indexPath.item)
+        
+        if configuredCell == nil {
+            let viewController = viewControllers[indexPath.item]
+            cell.titleLabel.text = viewController.tabBarItem.title
+        }
         
         return cell
     }
@@ -370,4 +342,45 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         return index >= 0 && index < self.items.count
     }
 }
+
+class TabFlowController: UICollectionViewFlowLayout {
+    
+    override init() {
+        super.init()
+        self.minimumInteritemSpacing = 0
+        self.minimumLineSpacing = 0
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.minimumInteritemSpacing = 0
+        self.minimumLineSpacing = 0
+        
+    }
+    override func targetContentOffsetForProposedContentOffset(proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
+        guard let collectionView = self.collectionView else {
+            return proposedContentOffset
+        }
+        
+        var offset = CGFloat(MAXFLOAT)
+        let halfWidth = CGRectGetWidth(collectionView.bounds) / 2.0
+        let horizontalCenter = proposedContentOffset.x + halfWidth
+        
+        let targetRect = CGRectMake(proposedContentOffset.x, 0.0, collectionView.bounds.size.width, collectionView.bounds.size.height)
+        
+        let layoutAttributes = self.layoutAttributesForElementsInRect(targetRect)
+        
+        for attributes in (layoutAttributes ?? []) {
+            let itemHorizontalCenter = attributes.center.x
+            if abs(itemHorizontalCenter - horizontalCenter) < abs(offset) {
+                offset = itemHorizontalCenter - horizontalCenter
+            }
+        }
+        
+        let targetPoint = CGPointMake(min(collectionView.contentSize.width - collectionView.frame.size.width, max(0, proposedContentOffset.x + offset)), 0)
+        return targetPoint
+    }
+}
+
+
 

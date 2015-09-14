@@ -14,6 +14,7 @@ class ViewController: ScrollingTabController, ScrollingTabControllerDataSource {
         super.init(coder: aDecoder)
         
         self.buildViewControllers()
+        self.dataSource = self
     }
     
     func buildViewControllers() {
@@ -37,9 +38,20 @@ class ViewController: ScrollingTabController, ScrollingTabControllerDataSource {
             }
             viewController.view.backgroundColor = color
             viewController.itemTextLabel.text = "\(i)"
+            viewController.tabBarItem.title = "VC \(i)"
             
             self.viewControllers.append(viewController)
         }
+    }
+    
+    internal func tabView(tabView: ScrollingTabController, configureTitleCell cell: UICollectionViewCell, atIndex index: Int) -> UICollectionViewCell {
+        guard let tabCell = cell as? ScrollingTabCell else {
+            return cell
+        }
+        
+        tabCell.titleLabel.text = "Item \(index)"
+        
+        return tabCell
     }
 }
 
