@@ -11,90 +11,11 @@ import UIKit
 public let ScrollingTabVerticalDividerType = "VerticalDivider"
 public let ScrollingTabTitleCell = "TabCell"
 
-public class ScrollingTabViewFlowLayout: UICollectionViewFlowLayout {
-
-    public var topDividerMargin: CGFloat = 10.0
-    public var bottomDividerMargin: CGFloat = 10.0
-    public var dividerWidth: CGFloat = 1.0
-    public var dividerColor: UIColor = UIColor.blackColor()
-    public var showDivider: Bool = false
-    
-    override init() {
-        super.init()
-        self.setup()
-    }
-    
-    required public init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        self.setup()
-    }
-    
-    func setup() {
-        self.sectionInset = UIEdgeInsetsZero
-        self.minimumInteritemSpacing = 0
-        self.minimumLineSpacing = 0
-        self.itemSize = CGSizeMake(100, 30.0)
-        self.scrollDirection = .Horizontal
-    }
-    
-    override public func layoutAttributesForDecorationViewOfKind(elementKind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
-        let attributes = self.layoutAttributesForItemAtIndexPath(indexPath)
-        let dividerAttributes = UICollectionViewLayoutAttributes(forDecorationViewOfKind: ScrollingTabVerticalDividerType, withIndexPath: indexPath)
-        
-        if let attributes = attributes, collectionView = self.collectionView {
-            dividerAttributes.frame = CGRectMake(CGRectGetMaxX(attributes.frame),
-                self.topDividerMargin,
-                self.dividerWidth,
-                CGRectGetHeight(collectionView.frame) - self.topDividerMargin - self.bottomDividerMargin)
-        }
-        
-        dividerAttributes.zIndex = -1
-        
-        return dividerAttributes
-    }
-
-    override public func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-        guard let attributes = super.layoutAttributesForElementsInRect(rect) else {
-            return nil
-        }
-        
-        var updatedAttributes = attributes
-        
-        if self.showDivider {
-            for layoutAttribute in attributes {
-                if (layoutAttribute.representedElementCategory == .Cell) {
-                    if let dividerAttribute = self.layoutAttributesForDecorationViewOfKind(ScrollingTabVerticalDividerType,
-                        atIndexPath: layoutAttribute.indexPath) {
-                            updatedAttributes.append(dividerAttribute)
-                    }
-                }
-            }
-        }
-        
-        return updatedAttributes
-    }
-}
-
-public class ScrollingTabDivider: UICollectionReusableView {
-   
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
-        self.setup()
-    }
-    
-    public required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        self.setup()
-    }
-    
-    func setup() {
-        self.backgroundColor = UIColor.blackColor()
-    }
-}
 
 public class ScrollingTabView: UIView {
     
     public var collectionView: UICollectionView!
+    public var scrollingLayout: ScrollingTabViewFlowLayout!
     
     public var selectionIndicatorOffset: CGFloat = 0 {
         didSet {
@@ -124,6 +45,12 @@ public class ScrollingTabView: UIView {
         }
     }
     
+    public var centerSelectTabs: Bool = false {
+        didSet {
+            self.setNeedsLayout()
+        }
+    }
+    
     var selectionIndicatorLeadingConstraint: NSLayoutConstraint!
     var selectionIndicatorBottomConstraint: NSLayoutConstraint!
     var selectionIndicatorHeightConstraint: NSLayoutConstraint!
@@ -144,7 +71,8 @@ public class ScrollingTabView: UIView {
     func setup() {
         self.backgroundColor = UIColor.whiteColor()
         
-        self.collectionView = UICollectionView(frame: CGRectZero, collectionViewLayout: ScrollingTabViewFlowLayout())
+        self.scrollingLayout = ScrollingTabViewFlowLayout()
+        self.collectionView = UICollectionView(frame: CGRectZero, collectionViewLayout: self.scrollingLayout)
         self.collectionView.translatesAutoresizingMaskIntoConstraints = false
         self.collectionView.backgroundColor = UIColor.clearColor()
         self.addSubview(self.collectionView)
@@ -177,6 +105,10 @@ public class ScrollingTabView: UIView {
     public override func layoutSubviews() {
         super.layoutSubviews()
         self.bringSubviewToFront(self.selectionIndicator)
+        if self.centerSelectTabs {
+            let inset = self.collectionView.frame.width / 2.0 - self.scrollingLayout.itemSize.width / 2.0
+            self.collectionView.contentInset = UIEdgeInsetsMake(0, inset, 0, inset)
+        }
     }
     
     public func panToPercentage(percentage: CGFloat) {
@@ -239,12 +171,16 @@ public class ScrollingTabView: UIView {
         self.selectionIndicatorLeadingConstraint.constant = x + self.selectionIndicatorEdgeInsets.left
         self.selectionIndicatorWidthConstraint.constant = width - self.selectionIndicatorEdgeInsets.left - self.selectionIndicatorEdgeInsets.right
         
-        if x > (CGRectGetWidth(self.frame) / 2.0) - (width / 2.0) {
+        if self.centerSelectTabs {
+            self.collectionView.contentOffset = CGPointMake(x - (CGRectGetWidth(self.frame) / 2 - width / 2.0), 0)
+        } else {
+            if x > (CGRectGetWidth(self.frame) / 2.0) - (width / 2.0) {
+                
+                if (x < self.collectionView.contentSize.width - (CGRectGetWidth(self.frame) / 2.0) - (width / 2.0)) {
+                    self.collectionView.contentOffset = CGPointMake(x - (CGRectGetWidth(self.frame) / 2 - width / 2.0), 0)
+                }
             
-            if (x < self.collectionView.contentSize.width - (CGRectGetWidth(self.frame) / 2.0) - (width / 2.0)) {
-                self.collectionView.contentOffset = CGPointMake(x - (CGRectGetWidth(self.frame) / 2 - width / 2.0), 0)
             }
-            
         }
     }
     
@@ -259,3 +195,85 @@ public class ScrollingTabView: UIView {
         }
     }
 }
+
+public class ScrollingTabViewFlowLayout: UICollectionViewFlowLayout {
+    
+    public var topDividerMargin: CGFloat = 10.0
+    public var bottomDividerMargin: CGFloat = 10.0
+    public var dividerWidth: CGFloat = 1.0
+    public var dividerColor: UIColor = UIColor.blackColor()
+    public var showDivider: Bool = false
+    
+    override init() {
+        super.init()
+        self.setup()
+    }
+    
+    required public init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.setup()
+    }
+    
+    func setup() {
+        self.sectionInset = UIEdgeInsetsZero
+        self.minimumInteritemSpacing = 0
+        self.minimumLineSpacing = 0
+        self.itemSize = CGSizeMake(100, 30.0)
+        self.scrollDirection = .Horizontal
+    }
+    
+    override public func layoutAttributesForDecorationViewOfKind(elementKind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
+        let attributes = self.layoutAttributesForItemAtIndexPath(indexPath)
+        let dividerAttributes = UICollectionViewLayoutAttributes(forDecorationViewOfKind: ScrollingTabVerticalDividerType, withIndexPath: indexPath)
+        
+        if let attributes = attributes, collectionView = self.collectionView {
+            dividerAttributes.frame = CGRectMake(CGRectGetMaxX(attributes.frame),
+                self.topDividerMargin,
+                self.dividerWidth,
+                CGRectGetHeight(collectionView.frame) - self.topDividerMargin - self.bottomDividerMargin)
+        }
+        
+        dividerAttributes.zIndex = -1
+        
+        return dividerAttributes
+    }
+    
+    override public func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+        guard let attributes = super.layoutAttributesForElementsInRect(rect) else {
+            return nil
+        }
+        
+        var updatedAttributes = attributes
+        
+        if self.showDivider {
+            for layoutAttribute in attributes {
+                if (layoutAttribute.representedElementCategory == .Cell) {
+                    if let dividerAttribute = self.layoutAttributesForDecorationViewOfKind(ScrollingTabVerticalDividerType,
+                        atIndexPath: layoutAttribute.indexPath) {
+                            updatedAttributes.append(dividerAttribute)
+                    }
+                }
+            }
+        }
+        
+        return updatedAttributes
+    }
+}
+
+public class ScrollingTabDivider: UICollectionReusableView {
+    
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.setup()
+    }
+    
+    public required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.setup()
+    }
+    
+    func setup() {
+        self.backgroundColor = UIColor.blackColor()
+    }
+}
+

@@ -61,9 +61,14 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         }
     }
     
+    public var centerSelectTabs: Bool = false {
+        didSet {
+            self.tabView.centerSelectTabs = centerSelectTabs
+        }
+    }
+    
     var viewControllerCache = NSCache()
     var tabControllersView: UIScrollView!
-    var collectionViewLayout = TabFlowController()
     var jumpScroll = false
 
     var currentPage: Int = 0
@@ -404,45 +409,5 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         return index >= 0 && index < self.items.count
     }
 }
-
-class TabFlowController: UICollectionViewFlowLayout {
-    
-    override init() {
-        super.init()
-        self.minimumInteritemSpacing = 0
-        self.minimumLineSpacing = 0
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        self.minimumInteritemSpacing = 0
-        self.minimumLineSpacing = 0
-        
-    }
-    override func targetContentOffsetForProposedContentOffset(proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
-        guard let collectionView = self.collectionView else {
-            return proposedContentOffset
-        }
-        
-        var offset = CGFloat(MAXFLOAT)
-        let halfWidth = CGRectGetWidth(collectionView.bounds) / 2.0
-        let horizontalCenter = proposedContentOffset.x + halfWidth
-        
-        let targetRect = CGRectMake(proposedContentOffset.x, 0.0, collectionView.bounds.size.width, collectionView.bounds.size.height)
-        
-        let layoutAttributes = self.layoutAttributesForElementsInRect(targetRect)
-        
-        for attributes in (layoutAttributes ?? []) {
-            let itemHorizontalCenter = attributes.center.x
-            if abs(itemHorizontalCenter - horizontalCenter) < abs(offset) {
-                offset = itemHorizontalCenter - horizontalCenter
-            }
-        }
-        
-        let targetPoint = CGPointMake(min(collectionView.contentSize.width - collectionView.frame.size.width, max(0, proposedContentOffset.x + offset)), 0)
-        return targetPoint
-    }
-}
-
 
 
