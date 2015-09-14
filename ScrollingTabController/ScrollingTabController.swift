@@ -217,15 +217,6 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         }
     }
     
-    func tabWidth() -> CGFloat {
-//        guard self.items.count > 0 else {
-////            return theme.tab.minWidth
-//        }
-        
-        let fittingWidth = view.bounds.width / CGFloat(items.count)
-        return max(fittingWidth, /*theme.tab.minWidth*/100)
-    }
-    
     public func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         return 1
     }

@@ -34,6 +34,8 @@ class ScrollingTabCell: UICollectionViewCell {
     
     func setup() {
         
+        self.backgroundColor = UIColor.clearColor()
+        
         self.titleLabel = UILabel()
         self.titleLabel.translatesAutoresizingMaskIntoConstraints = false
         self.titleLabel.textAlignment = .Center
