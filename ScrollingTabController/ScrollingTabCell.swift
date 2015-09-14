@@ -13,6 +13,16 @@ class ScrollingTabCell: UICollectionViewCell {
     var titleLabel: UILabel!
     var backgroundImageView: UIImageView!
     
+    override var selected: Bool {
+        didSet {
+            if selected {
+                self.titleLabel.textColor = self.tintColor
+            } else {
+                self.titleLabel.textColor = UIColor.darkTextColor()
+            }
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.setup()
@@ -24,8 +34,10 @@ class ScrollingTabCell: UICollectionViewCell {
     }
     
     func setup() {
+        
         self.titleLabel = UILabel()
         self.titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        self.titleLabel.textAlignment = .Center
         self.contentView.addSubview(self.titleLabel)
         
         let horizontalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|[view]|",
@@ -40,4 +52,5 @@ class ScrollingTabCell: UICollectionViewCell {
         self.contentView.addConstraints(horizontalConstraints)
         self.contentView.addConstraints(verticalConstraints)
     }
+    
 }

@@ -8,8 +8,15 @@
 
 import UIKit
 
+public let ScrollingTabVerticalDividerType = "VerticalDivider"
+public let ScrollingTabTitleCell = "TabCell"
+
 public class ScrollingTabViewFlowLayout: UICollectionViewFlowLayout {
 
+    public var topDividerMargin: CGFloat = 10.0
+    public var bottomDividerMargin: CGFloat = 10.0
+    public var dividerWidth: CGFloat = 1.0
+    
     override init() {
         super.init()
         self.setup()
@@ -27,14 +34,98 @@ public class ScrollingTabViewFlowLayout: UICollectionViewFlowLayout {
         self.itemSize = CGSizeMake(100, 30.0)
         self.scrollDirection = .Horizontal
     }
+    
+    override public func layoutAttributesForDecorationViewOfKind(elementKind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
+        let attributes = self.layoutAttributesForItemAtIndexPath(indexPath)
+        let dividerAttributes = UICollectionViewLayoutAttributes(forDecorationViewOfKind: ScrollingTabVerticalDividerType, withIndexPath: indexPath)
+        
+        if let attributes = attributes, collectionView = self.collectionView {
+            dividerAttributes.frame = CGRectMake(CGRectGetMaxX(attributes.frame),
+                self.topDividerMargin,
+                self.dividerWidth,
+                CGRectGetHeight(collectionView.frame) - self.topDividerMargin - self.bottomDividerMargin)
+        }
+        
+        dividerAttributes.zIndex = -1
+        
+        return dividerAttributes
+    }
+
+    override public func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+        guard let attributes = super.layoutAttributesForElementsInRect(rect) else {
+            return nil
+        }
+        
+        var updatedAttributes = attributes
+        
+        for layoutAttribute in attributes {
+            if (layoutAttribute.representedElementCategory == .Cell) {
+                if let dividerAttribute = self.layoutAttributesForDecorationViewOfKind(ScrollingTabVerticalDividerType,
+                    atIndexPath: layoutAttribute.indexPath) {
+                    updatedAttributes.append(dividerAttribute)
+                }
+            }
+        }
+        
+        return updatedAttributes
+    }
+    
+//    override public func targetContentOffsetForProposedContentOffset(proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
+//        guard let collectionView = self.collectionView else {
+//            return proposedContentOffset
+//        }
+//        
+//        var offset = CGFloat(MAXFLOAT)
+//        let halfWidth = CGRectGetWidth(collectionView.bounds) / 2.0
+//        let horizontalCenter = proposedContentOffset.x + halfWidth
+//        
+//        let targetRect = CGRectMake(proposedContentOffset.x, 0.0, collectionView.bounds.size.width, collectionView.bounds.size.height)
+//        
+//        let layoutAttributes = self.layoutAttributesForElementsInRect(targetRect)
+//        
+//        for attributes in (layoutAttributes ?? []) {
+//            let itemHorizontalCenter = attributes.center.x
+//            if abs(itemHorizontalCenter - horizontalCenter) < abs(offset) {
+//                offset = itemHorizontalCenter - horizontalCenter
+//            }
+//        }
+//        
+//        let targetPoint = CGPointMake(min(collectionView.contentSize.width - collectionView.frame.size.width, max(0, proposedContentOffset.x + offset)), 0)
+//        return targetPoint
+//    }
+}
+
+public class ScrollingTabDivider: UICollectionReusableView {
+   
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.setup()
+    }
+    
+    public required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.setup()
+    }
+    
+    func setup() {
+        self.backgroundColor = UIColor.blackColor()
+    }
 }
 
 public class ScrollingTabView: UICollectionView {
     
+    public var selectionIndicatorOffset: CGFloat = 40
+    public var selectionIndicator: UIView!
+    public var selectionIndicatorHeight: CGFloat = 5
+    
+    var selectionIndicatorLeadingConstraint: NSLayoutConstraint!
+    var selectionIndicatorBottomConstraint: NSLayoutConstraint!
+    var selectionIndicatorHeightConstraint: NSLayoutConstraint!
+    var selectionIndicatorWidthConstraint: NSLayoutConstraint!
+    
     public convenience init()
     {
         self.init(frame: CGRectZero, collectionViewLayout: ScrollingTabViewFlowLayout())
-        self.backgroundColor = UIColor.whiteColor()
     }
     
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
@@ -48,9 +139,95 @@ public class ScrollingTabView: UICollectionView {
     }
     
     func setup() {
-        self.registerClass(ScrollingTabCell.classForCoder(), forCellWithReuseIdentifier: "TabCell")
+        self.backgroundColor = UIColor.whiteColor()
+    
+        self.selectionIndicator = UIView()
+        self.selectionIndicator.translatesAutoresizingMaskIntoConstraints = false
+        self.selectionIndicator.backgroundColor = self.selectionIndicator.tintColor
+        self.addSubview(self.selectionIndicator)
+        self.selectionIndicatorBottomConstraint = NSLayoutConstraint(item: self.selectionIndicator, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: self, attribute: NSLayoutAttribute.Bottom, multiplier: 1, constant: self.selectionIndicatorOffset)
+        self.selectionIndicatorLeadingConstraint = NSLayoutConstraint(item: self.selectionIndicator, attribute: NSLayoutAttribute.Leading, relatedBy: NSLayoutRelation.Equal, toItem: self, attribute: NSLayoutAttribute.Leading, multiplier: 1, constant: 0)
+        self.selectionIndicatorHeightConstraint = NSLayoutConstraint(item: self.selectionIndicator, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: self.selectionIndicatorHeight)
+        self.selectionIndicatorWidthConstraint = NSLayoutConstraint(item: self.selectionIndicator, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 100)
+        
+        NSLayoutConstraint.activateConstraints([self.selectionIndicatorBottomConstraint, self.selectionIndicatorLeadingConstraint, self.selectionIndicatorHeightConstraint, self.selectionIndicatorWidthConstraint])
+        
+        self.registerClass(ScrollingTabCell.classForCoder(), forCellWithReuseIdentifier: ScrollingTabTitleCell)
+        self.collectionViewLayout.registerClass(ScrollingTabDivider.classForCoder(), forDecorationViewOfKind: ScrollingTabVerticalDividerType)
         
         self.showsHorizontalScrollIndicator = false
         self.showsVerticalScrollIndicator = false
     }
+    
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        self.bringSubviewToFront(self.selectionIndicator)
+    }
+    
+    public func panToPercentage(percentage: CGFloat) {
+        
+        let tabCount = self.numberOfItemsInSection(0)
+        let percentageInterval = CGFloat(1.0 / Double(tabCount))
+        
+        let firstItem = floorf(Float(percentage / percentageInterval))
+        let secondItem = firstItem + 1
+
+        var firstPath: NSIndexPath?
+        var secondPath: NSIndexPath?
+        
+        if (firstItem < 0)
+        {
+            firstPath = NSIndexPath(forItem: 0, inSection: 0)
+            secondPath = firstPath
+        }
+        else if (Int(firstItem) >= tabCount) {
+            firstPath = NSIndexPath(forItem: tabCount - 1, inSection: 0)
+            secondPath = firstPath
+        }
+        else
+        {
+            firstPath = NSIndexPath(forItem: Int(firstItem), inSection: 0)
+            if (secondItem < 0) {
+                secondPath = NSIndexPath(forItem: 0, inSection: 0)
+            } else if (Int(secondItem) >= tabCount) {
+                secondPath = NSIndexPath(forItem: tabCount - 1, inSection: 0)
+            }
+            else {
+                secondPath = NSIndexPath(forItem: Int(secondItem), inSection: 0)
+            }
+    
+        
+        }
+        
+        let shareSecond = percentage + percentageInterval - CGFloat(secondItem) * percentageInterval
+        let shareFirst = percentageInterval - shareSecond
+        let percentFirst = shareFirst / percentageInterval
+        let percentSecond = shareSecond / percentageInterval
+        
+        let attrs1 = self.collectionViewLayout.layoutAttributesForItemAtIndexPath(firstPath!)
+        let attrs2 = self.collectionViewLayout.layoutAttributesForItemAtIndexPath(secondPath!)
+        
+        let firstFrame = attrs1?.frame
+        let secondFrame = attrs2?.frame
+        
+        var x = CGRectGetWidth(firstFrame!) * percentSecond + CGRectGetMinX(firstFrame!)
+        if firstItem < 0 {
+            x -= CGRectGetWidth(firstFrame!)
+        }
+
+        let width = CGRectGetWidth(firstFrame!) * percentFirst + CGRectGetWidth(secondFrame!) * percentSecond
+        
+        self.selectionIndicatorLeadingConstraint.constant = x
+        self.selectionIndicatorWidthConstraint.constant = width
+        
+        if x > (CGRectGetWidth(self.frame) / 2.0) - (width / 2.0) {
+            
+            if (x < self.contentSize.width - (CGRectGetWidth(self.frame) / 2.0) - (width / 2.0)) {
+                self.contentOffset = CGPointMake(x - (CGRectGetWidth(self.frame) / 2 - width / 2.0), 0)
+            }
+            
+        }
+    }
+    
+
 }

@@ -17,7 +17,7 @@ class ViewController: ScrollingTabController, ScrollingTabControllerDataSource {
     }
     
     func buildViewControllers() {
-        for i in 1...100 {
+        for i in 1...10 {
             let viewController = TestingViewController()
             
             var color = UIColor.whiteColor()

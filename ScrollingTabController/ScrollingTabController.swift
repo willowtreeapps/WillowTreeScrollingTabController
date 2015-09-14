@@ -45,38 +45,6 @@ class TabFlowController: UICollectionViewFlowLayout {
         let targetPoint = CGPointMake(min(collectionView.contentSize.width - collectionView.frame.size.width, max(0, proposedContentOffset.x + offset)), 0)
         return targetPoint
     }
-    
-//    - (CGPoint)targetContentOffsetForProposedContentOffset:(CGPoint)proposedContentOffset
-//    withScrollingVelocity:(CGPoint)velocity
-//    {
-//    CGFloat offsetAdjustment = MAXFLOAT;
-//    CGFloat cvHalfWidth = (CGRectGetWidth(self.collectionView.bounds) / 2.0);
-//    CGFloat horizontalCenter = proposedContentOffset.x + cvHalfWidth;
-//    
-//    CGRect targetRect = CGRectMake(proposedContentOffset.x,
-//    0.0,
-//    self.collectionView.bounds.size.width,
-//    self.collectionView.bounds.size.height);
-//    
-//    NSArray *array = [super layoutAttributesForElementsInRect:targetRect];
-//    
-//    for (UICollectionViewLayoutAttributes* layoutAttributes in array)
-//    {
-//    CGFloat itemHorizontalCenter = layoutAttributes.center.x;
-//    if (ABS(itemHorizontalCenter - horizontalCenter) < ABS(offsetAdjustment))
-//    {
-//    offsetAdjustment = itemHorizontalCenter - horizontalCenter;
-//    }
-//    }
-//    
-//    CGPoint p = CGPointMake(
-//    MIN(self.collectionView.contentSize.width - [self.collectionView frameSizeWidth],
-//    MAX(0, proposedContentOffset.x + offsetAdjustment)),
-//    proposedContentOffset.y);
-//    
-//    return p;
-//    }
-
 }
 
 protocol ScrollingTabControllerDataSource {
@@ -175,6 +143,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
             self.items.append(TabItem(self.addTabContainer(), viewController))
         }
     }
+    
     func addTabContainer() -> UIView {
         let firstTab = (self.items.count == 0)
         
@@ -216,15 +185,13 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         guard shouldLoadTab(index) else { return }
         guard !loadedPages.contains(index) else { return }
         
-        debugPrint("Loading tag \(index) number of children \(self.childViewControllers.count)")
         switch index {
         case loadedPages.start - 1:
             loadedPages = HalfOpenInterval<Int>(index, loadedPages.end)
         case loadedPages.end:
             loadedPages = HalfOpenInterval<Int>(loadedPages.start, index + 1)
         default:
-            print("Would have crashed load")
-//            fatalError("Should not be able to load tabs not adjacent to loaded tabs")
+            loadedPages = HalfOpenInterval<Int>(index, index)
         }
         
         let container = items[index].container
@@ -247,7 +214,6 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         guard !shouldLoadTab(index) else { return }
         guard loadedPages.contains(index) else { return }
         
-        print("Unload tab at index \(index)")
         switch index {
         case loadedPages.start:
             loadedPages = HalfOpenInterval<Int>(index + 1, loadedPages.end)
@@ -266,12 +232,9 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     
     func unloadTabs() {
         for index in 0..<items.count {
-            print("Index \(index)")
             if !shouldLoadTab(index) {
-                print("Not in range")
                 let child = items[index].controller
                 if child.parentViewController != nil {
-                    print("REmove child")
                     child.willMoveToParentViewController(nil)
                     child.view.removeFromSuperview()
                     child.removeFromParentViewController()
@@ -307,67 +270,23 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("TabCell", forIndexPath: indexPath) as! ScrollingTabCell
         
-        cell.titleLabel.text = "item \(indexPath.item)"
+        cell.titleLabel.text = "item \(indexPath.item + 1)"
         
         return cell
+    }
+    
+    public func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
+        var view = UICollectionReusableView()
+        if kind == ScrollingTabVerticalDividerType {
+            view = collectionView.dequeueReusableSupplementaryViewOfKind(ScrollingTabVerticalDividerType, withReuseIdentifier: ScrollingTabVerticalDividerType, forIndexPath: indexPath)
+        }
+        
+        return view;
     }
     
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         scrollToPage(indexPath.item, animate: true)
     }
-
-//    public func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
-//        return 1
-//    }
-//    
-//    public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        return self.childControllers.count
-//    }
-//    
-//    public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-//        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("Cell", forIndexPath: indexPath) as! ScrollingViewControllerCell
-//        
-//        let viewController = self.childControllers[indexPath.item]
-//        
-//        if cell.viewController == nil || !(cell.viewController === viewController) {
-//            
-//            cell.parentViewController = self
-//            cell.viewController = viewController
-//            
-//            if let snapshot = self.viewControllerCache.objectForKey(indexPath) as? UIView {
-//                cell.snapshotView = snapshot
-//            }
-//        }
-//
-//            
-//        return cell
-//    }
-    
-//    public func scrollViewDidScroll(scrollView: UIScrollView) {
-//        if (!scrollingStarted)
-//        {
-//            scrollingStarted = true
-//            for indexPath in self.collectionView.indexPathsForVisibleItems() {
-//                if let vcCell = self.collectionView.cellForItemAtIndexPath(indexPath) as? ScrollingViewControllerCell {
-//                    let snapshot = vcCell.snapshotViewAfterScreenUpdates(false)
-//                    self.viewControllerCache.setObject(snapshot, forKey: indexPath)
-//                }
-//            }
-//        }
-//    }
-//    
-//    public func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-//        scrollingStarted = false
-//        for cell in self.collectionView.visibleCells() {
-//            if let vcCell = cell as? ScrollingViewControllerCell {
-//                vcCell.loadViewController()
-//            }
-//        }
-//    }
-//    
-//    public func scrollViewDidEndScrollingAnimation(scrollView: UIScrollView) {
-//        scrollingStarted = false
-//    }
     
     override public func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
@@ -376,6 +295,8 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
 
         coordinator.animateAlongsideTransition(nil, completion: { context in
             self.updatingCurrentPage = true
+            let percentage = self.tabControllersView.contentOffset.x / self.tabControllersView.contentSize.width;
+            self.tabView.panToPercentage(percentage)
         })
     }
     
@@ -385,8 +306,8 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         if page != currentPage {
             currentPage = page
             
-            self.tabView.selectItemAtIndexPath(NSIndexPath(forItem: currentPage, inSection: 0), animated: true, scrollPosition: .Left)
-            
+//            self.tabView.selectItemAtIndexPath(NSIndexPath(forItem: currentPage, inSection: 0), animated: false, scrollPosition: .None)
+//            self.tabView.scrollToItemAtIndexPath(NSIndexPath(forItem: currentPage, inSection: 0), atScrollPosition: .CenteredHorizontally, animated: true)
             for offset in 0...(numToPreload + 1) {
                 lazyLoad(page - offset)
                 if offset > 0 {
@@ -408,6 +329,9 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         if scrollView.tracking {
             self.checkAndLoadPages()
         }
+        
+        let percentage = scrollView.contentOffset.x / scrollView.contentSize.width;
+        self.tabView.panToPercentage(percentage)
     }
     
     public func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
@@ -421,7 +345,6 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     }
     
     public func scrollViewDidEndScrollingAnimation(scrollView: UIScrollView) {
-        debugPrint("Ended scrolling animation")
         loadedPages = HalfOpenInterval<Int>(currentPage, currentPage)
         lazyLoad(currentPage)
         self.jumpScroll = false
