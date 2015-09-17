@@ -35,7 +35,7 @@ public class ScrollingTabView: UIView {
         }
     }
     
-    public var selectionIndicatorEdgeInsets: UIEdgeInsets = UIEdgeInsetsMake(0, 5, 0, 5)
+    public var selectionIndicatorEdgeInsets: UIEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0)
     
     public var sizeTabsToFitWidth: Bool = false {
         didSet {

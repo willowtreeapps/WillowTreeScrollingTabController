@@ -133,16 +133,12 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         super.viewDidAppear(animated)
         self.tabView.panToPercentage(0)
     }
+    
+    /// Listen to the contentSize changing in order to provide a smooth animation during rotation.
     override public func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         tabControllersView.contentOffset = CGPointMake(CGFloat(currentPage) * tabControllersView.bounds.width, 0)
     }
 
-    
-    public override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
     func configureViewControllers() {
         for item in self.items {
             let child = item.controller
@@ -232,7 +228,6 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     func unloadTab(index: Int) {
         guard inRange(index) else { return }
         guard !shouldLoadTab(index) else { return }
-        guard loadedPages.contains(index) else { return }
         
         switch index {
         case loadedPages.start:
@@ -240,8 +235,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         case loadedPages.end - 1:
             loadedPages = HalfOpenInterval<Int>(loadedPages.start, index)
         default:
-            print("Would have crashed unload")
-//            fatalError("Should not be able to unload tabs not on the edges of loaded range")
+            break
         }
         
         let child = items[index].controller
@@ -251,16 +245,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     }
     
     func unloadTabs() {
-        for index in 0..<items.count {
-            if !shouldLoadTab(index) {
-                let child = items[index].controller
-                if child.parentViewController != nil {
-                    child.willMoveToParentViewController(nil)
-                    child.view.removeFromSuperview()
-                    child.removeFromParentViewController()
-                }
-            }
-        }
+        
     }
     
     func reloadData() {
@@ -387,7 +372,12 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         loadedPages = HalfOpenInterval<Int>(currentPage, currentPage)
         lazyLoad(currentPage)
         self.jumpScroll = false
-        unloadTabs()
+        
+        // When scrolling with animation, not all items may be captured in the loadedPages interval.
+        // This clears out any remaining views left on the scrollview.
+        for index in 0..<items.count {
+            self.unloadTab(index)
+        }
     }
     
     func scrollToPage(index: Int, animate: Bool) {
