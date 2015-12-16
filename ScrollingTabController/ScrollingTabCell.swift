@@ -8,8 +8,12 @@
 
 import UIKit
 
+/**
+ * Default tab cell implementation for the tab controller
+ */
 class ScrollingTabCell: UICollectionViewCell {
     
+    /// Title label shown in the cell.
     var titleLabel: UILabel!
     
     override var selected: Bool {
