@@ -51,12 +51,29 @@ public class ScrollingTabView: UIView {
         }
     }
     
+    public var classForCell: AnyClass = ScrollingTabCell.classForCoder() {
+        didSet {
+            if self.collectionView != nil {
+                self.collectionView.registerClass(classForCell, forCellWithReuseIdentifier: ScrollingTabTitleCell)
+            }
+        }
+    }
+    public var classForDivider: AnyClass = ScrollingTabDivider.classForCoder() {
+        didSet {
+            if self.collectionView != nil {
+                self.collectionView.collectionViewLayout.registerClass(classForDivider, forDecorationViewOfKind: ScrollingTabVerticalDividerType)
+                self.collectionView.collectionViewLayout.invalidateLayout()
+            }
+        }
+    }
+    
     var selectionIndicatorLeadingConstraint: NSLayoutConstraint!
     var selectionIndicatorBottomConstraint: NSLayoutConstraint!
     var selectionIndicatorHeightConstraint: NSLayoutConstraint!
     var selectionIndicatorWidthConstraint: NSLayoutConstraint!
     
     private var lastPercentage: CGFloat = 0
+    
     
     override public init(frame: CGRect) {
         super.init(frame: frame)
@@ -67,6 +84,15 @@ public class ScrollingTabView: UIView {
         super.init(coder: aDecoder)
         self.setup()
     }
+    
+    public init?(coder aDecoder: NSCoder, titleCellClass: AnyClass, dividerCellClass: AnyClass) {
+        super.init(coder: aDecoder)
+        self.classForCell = titleCellClass
+        self.classForDivider = dividerCellClass
+        self.setup()
+    }
+    
+    
 
     func setup() {
         self.backgroundColor = UIColor.whiteColor()
@@ -95,8 +121,8 @@ public class ScrollingTabView: UIView {
         
         NSLayoutConstraint.activateConstraints([self.selectionIndicatorBottomConstraint, self.selectionIndicatorLeadingConstraint, self.selectionIndicatorHeightConstraint, self.selectionIndicatorWidthConstraint])
         
-        self.collectionView.registerClass(ScrollingTabCell.classForCoder(), forCellWithReuseIdentifier: ScrollingTabTitleCell)
-        self.collectionView.collectionViewLayout.registerClass(ScrollingTabDivider.classForCoder(), forDecorationViewOfKind: ScrollingTabVerticalDividerType)
+        self.collectionView.registerClass(self.classForCell, forCellWithReuseIdentifier: ScrollingTabTitleCell)
+        self.collectionView.collectionViewLayout.registerClass(self.classForDivider, forDecorationViewOfKind: ScrollingTabVerticalDividerType)
         
         self.collectionView.showsHorizontalScrollIndicator = false
         self.collectionView.showsVerticalScrollIndicator = false
