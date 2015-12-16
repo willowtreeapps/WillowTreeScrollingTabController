@@ -8,6 +8,8 @@ The ScrollingTabController provides a tab based container view with navigational
 * Dynamic tab sizes
 * Customizable tab selection positioning.
 
+<img src="docs/example.gif" width="300">
+
 ## Installation
 
 The preferred method to install is to use CocoaPods 
