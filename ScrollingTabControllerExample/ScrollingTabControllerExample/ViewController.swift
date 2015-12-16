@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: ScrollingTabController, ScrollingTabControllerDataSource {
+class ViewController: ScrollingTabController, TabDataSource {
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
