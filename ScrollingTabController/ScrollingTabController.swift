@@ -2,8 +2,25 @@
 //  ScrollingTabController.swift
 //  ScrollingTabControllerExample
 //
-//  Created by Erik LaManna on 9/2/15.
-//  Copyright © 2015 WillowTree, Inc. All rights reserved.
+//  Copyright (c) 2015 WillowTree, Inc.
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
 //
 
 import UIKit
@@ -47,7 +64,7 @@ public protocol TabDataSource: class {
      * Specifies the width for a specific tab cell at a given index.
      *
      * - Parameter tabView: the tab controller requesting the cell width
-     * - Parameter widthForCellAtInds: the index of the cell to return the width for
+     * - Parameter widthForCellAtIndex: the index of the cell to return the width for
      *
      * - Returns: The width of the cell at the index path.  Default nil (equal widths)
      */
