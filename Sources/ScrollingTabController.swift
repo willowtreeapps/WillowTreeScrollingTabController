@@ -19,7 +19,7 @@ public protocol ScrollingTabControllerDataSource: class {
     func tabView(tabView: ScrollingTabController, widthForCellAtIndex index: Int) -> CGFloat?
 }
 
-extension ScrollingTabControllerDataSource {
+public extension ScrollingTabControllerDataSource {
     
     func numberOfItemsInTabView(tabView: ScrollingTabController) -> Int? {
         return nil;

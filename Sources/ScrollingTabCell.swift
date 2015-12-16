@@ -8,11 +8,11 @@
 
 import UIKit
 
-class ScrollingTabCell: UICollectionViewCell {
+public class ScrollingTabCell: UICollectionViewCell {
     
-    var titleLabel: UILabel!
+    public var titleLabel: UILabel!
     
-    override var selected: Bool {
+    public override var selected: Bool {
         didSet {
             if selected {
                 self.titleLabel.textColor = self.tintColor
@@ -22,12 +22,12 @@ class ScrollingTabCell: UICollectionViewCell {
         }
     }
     
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         self.setup()
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         self.setup()
     }
