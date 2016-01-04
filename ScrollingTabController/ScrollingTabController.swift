@@ -61,7 +61,7 @@ public protocol TabDataSource: class {
     func tabView(tabView: ScrollingTabController, configureTitleCell cell: UICollectionViewCell, atIndex index: Int) -> UICollectionViewCell?
     
     /**
-     * Specifies the width for a specific tab cell at a given index.
+     * Returns the width for a specific tab cell at a given index.
      *
      * - Parameter tabView: the tab controller requesting the cell width
      * - Parameter widthForCellAtIndex: the index of the cell to return the width for
@@ -106,7 +106,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     /// The top ScrollingTabView
     public var tabView = ScrollingTabView()
     
-    /// Array of the view controllers that are contained in the botom view controller
+    /// Array of the view controllers that are contained in the bottom view controller
     public var viewControllers = [UIViewController]() {
         didSet {
             if self.tabControllersView != nil {
