@@ -2,24 +2,79 @@
 //  ScrollingTabController.swift
 //  ScrollingTabControllerExample
 //
-//  Created by Erik LaManna on 9/2/15.
-//  Copyright © 2015 WillowTree, Inc. All rights reserved.
+//  Copyright (c) 2015 WillowTree, Inc.
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
 //
 
 import UIKit
 
-public protocol ScrollingTabControllerDataSource: class {
-    
+/**
+ * Protocol used to provide data to the tab portion of the ScrollingTabController.
+ */
+public protocol TabDataSource: class {
+  
+    /**
+     * Returns the number of items in the tab view.
+     *
+     * - Parameter tabView: the tab controller requesting the tab count
+     *
+     * - Returns: An optional integer value representing the number of items in the tab view
+     */
     func numberOfItemsInTabView(tabView: ScrollingTabController) -> Int?
     
+    /** 
+     * Returns the view controller for the specified view index.
+     *
+     * - Parameter tabView: the tab controller requesting the tab count
+     * - Parameter viewControllerAtIndex: the index for the requested view controller
+     * 
+     * - Returns: The view controller at the specified index or nil if not found
+     */
     func tabView(tabView: ScrollingTabController, viewControllerAtIndex index: Int) -> UIViewController?
     
+    /**
+     * Configures the tab cell at the specified index.
+     *
+     * - Parameter tabView: the tab controller requesting the cell configuration
+     * - Parameter configureTitleCell: the UICollectionViewCell to configure
+     * - Parameter atIndex: the index of the cell to configure
+     *
+     * - Returns: The configured collection view cell
+     */
     func tabView(tabView: ScrollingTabController, configureTitleCell cell: UICollectionViewCell, atIndex index: Int) -> UICollectionViewCell?
     
+    /**
+     * Returns the width for a specific tab cell at a given index.
+     *
+     * - Parameter tabView: the tab controller requesting the cell width
+     * - Parameter widthForCellAtIndex: the index of the cell to return the width for
+     *
+     * - Returns: The width of the cell at the index path.  Default nil (equal widths)
+     */
     func tabView(tabView: ScrollingTabController, widthForCellAtIndex index: Int) -> CGFloat?
 }
 
-extension ScrollingTabControllerDataSource {
+/**
+ * Default protocol extension
+ */
+extension TabDataSource {
     
     func numberOfItemsInTabView(tabView: ScrollingTabController) -> Int? {
         return nil;
@@ -41,10 +96,17 @@ extension ScrollingTabControllerDataSource {
     }
 
 }
+
+/**
+ * Provides a common container view that has a collection view of tabs at the top, with a
+ * container collection view at the bottom.
+ */
 public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
     
+    /// The top ScrollingTabView
     public var tabView = ScrollingTabView()
     
+    /// Array of the view controllers that are contained in the bottom view controller
     public var viewControllers = [UIViewController]() {
         didSet {
             if self.tabControllersView != nil {
@@ -53,14 +115,17 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         }
     }
     
-    @IBInspectable public weak var dataSource: ScrollingTabControllerDataSource?
+    /// Data source for the tab controller
+    @IBInspectable public weak var dataSource: TabDataSource?
     
+    /// Specifies if the tab view should size the width of the tabs to their content.
     public var sizeTabItemsToFit: Bool = false {
         didSet {
             self.tabView.sizeTabsToFitWidth = sizeTabItemsToFit
         }
     }
     
+    /// Specifies if the selected tab item should remain centered within the containing view.
     public var centerSelectTabs: Bool = false {
         didSet {
             self.tabView.centerSelectTabs = centerSelectTabs
