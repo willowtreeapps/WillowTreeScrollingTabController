@@ -2,8 +2,25 @@
 //  ScrollingTabView.swift
 //  ScrollingTabControllerExample
 //
-//  Created by Erik LaManna on 9/4/15.
-//  Copyright © 2015 WillowTree, Inc. All rights reserved.
+//  Copyright (c) 2015 WillowTree, Inc.
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
 //
 
 import UIKit
@@ -11,12 +28,18 @@ import UIKit
 public let ScrollingTabVerticalDividerType = "VerticalDivider"
 public let ScrollingTabTitleCell = "TabCell"
 
-
+/**
+ * View that contains the top set of tabs and their containing collection view.
+ */
 public class ScrollingTabView: UIView {
     
+    /// Collection view containing the tabs
     public var collectionView: UICollectionView!
+    
+    /// Collection view layout for the tab view.
     public var scrollingLayout: ScrollingTabViewFlowLayout!
     
+    /// Specifies the offset of the selection indicator from the bottom of the view. Defaults to 0.
     public var selectionIndicatorOffset: CGFloat = 0 {
         didSet {
             if self.selectionIndicatorBottomConstraint != nil {
@@ -25,8 +48,10 @@ public class ScrollingTabView: UIView {
         }
     }
     
+    /// Returns the view used as the selection indicator
     public var selectionIndicator: UIView!
     
+    /// Specifies the height of the selection indicator. Defaults to 5.
     public var selectionIndicatorHeight: CGFloat = 5 {
         didSet {
             if self.selectionIndicatorHeightConstraint != nil {
@@ -35,8 +60,10 @@ public class ScrollingTabView: UIView {
         }
     }
     
+    /// Specifies the edge insets of the selection indicator to the cells.  Defaults to 0 insets.
     public var selectionIndicatorEdgeInsets: UIEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0)
     
+    /// Specifies if the tabs should size to fit their content
     public var sizeTabsToFitWidth: Bool = false {
         didSet {
             if (sizeTabsToFitWidth) {
@@ -45,12 +72,14 @@ public class ScrollingTabView: UIView {
         }
     }
     
+    /// Specifies if the selection of the tabs remains centered.
     public var centerSelectTabs: Bool = false {
         didSet {
             self.setNeedsLayout()
         }
     }
     
+    /// Specifies the cell to use for each tab.
     public var classForCell: AnyClass = ScrollingTabCell.classForCoder() {
         didSet {
             if self.collectionView != nil {
@@ -58,6 +87,8 @@ public class ScrollingTabView: UIView {
             }
         }
     }
+    
+    /// Specifies the class to use for the divider in the view.
     public var classForDivider: AnyClass = ScrollingTabDivider.classForCoder() {
         didSet {
             if self.collectionView != nil {
@@ -73,7 +104,6 @@ public class ScrollingTabView: UIView {
     var selectionIndicatorWidthConstraint: NSLayoutConstraint!
     
     private var lastPercentage: CGFloat = 0
-    
     
     override public init(frame: CGRect) {
         super.init(frame: frame)
@@ -91,8 +121,6 @@ public class ScrollingTabView: UIView {
         self.classForDivider = dividerCellClass
         self.setup()
     }
-    
-    
 
     func setup() {
         self.backgroundColor = UIColor.whiteColor()
@@ -222,12 +250,24 @@ public class ScrollingTabView: UIView {
     }
 }
 
+/**
+ * Custom collection view flow layout for the tab view.
+ */
 public class ScrollingTabViewFlowLayout: UICollectionViewFlowLayout {
     
+    /// Specifies the divider spacing from the top of the tab view. Defaults to 10.
     public var topDividerMargin: CGFloat = 10.0
+    
+    /// Specifies the divider spacing from the bottom of the tab view. Defaults to 10.
     public var bottomDividerMargin: CGFloat = 10.0
+    
+    /// Specifies the width of the divider view. Defaults to 1.
     public var dividerWidth: CGFloat = 1.0
+    
+    /// Specifies the color of the divider. Defaults to black.
     public var dividerColor: UIColor = UIColor.blackColor()
+    
+    /// Specifies if the divider is visible. Defaults to false.
     public var showDivider: Bool = false
     
     override init() {

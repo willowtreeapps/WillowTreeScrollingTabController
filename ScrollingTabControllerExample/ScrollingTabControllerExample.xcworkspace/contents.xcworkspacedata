@@ -2,9 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:../ScrollingTabController/ScrollingTabController.xcodeproj">
+      location = "group:ScrollingTabControllerExample.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:ScrollingTabControllerExample.xcodeproj">
+      location = "group:../ScrollingTabController/ScrollingTabController.xcodeproj">
    </FileRef>
 </Workspace>
