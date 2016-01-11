@@ -1,8 +1,7 @@
 //
 //  ScrollingTabController.swift
-//  ScrollingTabControllerExample
 //
-//  Copyright (c) 2015 WillowTree, Inc.
+//  Copyright (c) 2016 WillowTree, Inc.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -74,7 +73,7 @@ public protocol TabDataSource: class {
 /**
  * Default protocol extension
  */
-extension TabDataSource {
+public extension TabDataSource {
     
     func numberOfItemsInTabView(tabView: ScrollingTabController) -> Int? {
         return nil;

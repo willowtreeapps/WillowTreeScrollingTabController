@@ -1,8 +1,7 @@
 //
 //  ScrollingTabCell.swift
-//  ScrollingTabControllerExample
 //
-//  Copyright (c) 2015 WillowTree, Inc.
+//  Copyright (c) 2016 WillowTree, Inc.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -29,12 +28,12 @@ import UIKit
 /**
  * Default tab cell implementation for the tab controller
  */
-class ScrollingTabCell: UICollectionViewCell {
+public class ScrollingTabCell: UICollectionViewCell {
     
     /// Title label shown in the cell.
-    var titleLabel: UILabel!
+    public var titleLabel: UILabel!
     
-    override var selected: Bool {
+    public override var selected: Bool {
         didSet {
             if selected {
                 self.titleLabel.textColor = self.tintColor
@@ -44,12 +43,12 @@ class ScrollingTabCell: UICollectionViewCell {
         }
     }
     
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         self.setup()
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         self.setup()
     }
