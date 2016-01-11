@@ -25,6 +25,7 @@
 
 
 import UIKit
+import ScrollingTabController
 
 class ViewController: ScrollingTabController, TabDataSource {
 

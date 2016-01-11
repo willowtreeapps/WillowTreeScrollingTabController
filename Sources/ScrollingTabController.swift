@@ -74,7 +74,7 @@ public protocol TabDataSource: class {
 /**
  * Default protocol extension
  */
-extension TabDataSource {
+public extension TabDataSource {
     
     func numberOfItemsInTabView(tabView: ScrollingTabController) -> Int? {
         return nil;
