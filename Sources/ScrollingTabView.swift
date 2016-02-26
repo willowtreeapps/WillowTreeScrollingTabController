@@ -158,6 +158,9 @@ public class ScrollingTabView: UIView {
     public override func layoutSubviews() {
         super.layoutSubviews()
         self.bringSubviewToFront(self.selectionIndicator)
+        if sizeTabsToFitWidth {
+            self.calculateItemSizeToFitWidth(self.frame.width)
+        }
         if self.centerSelectTabs {
             let inset = self.collectionView.frame.width / 2.0 - self.scrollingLayout.itemSize.width / 2.0
             self.collectionView.contentInset = UIEdgeInsetsMake(0, inset, 0, inset)
