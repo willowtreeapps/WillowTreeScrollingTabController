@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="4RN-Ta-q1B">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9532" systemVersion="15D21" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="TWd-Ha-pRO">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -24,10 +25,54 @@
             </objects>
             <point key="canvasLocation" x="1367" y="489"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--manuallyAdded-->
+        <scene sceneID="UNd-bQ-r2a">
+            <objects>
+                <viewController title="manuallyAdded" id="Uuv-ax-Dy0" customClass="ContainerViewController" customModule="ScrollingTabControllerExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="MvS-nE-ygA"/>
+                        <viewControllerLayoutGuide type="bottom" id="7BL-hD-WbZ"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="PqO-lb-kbF">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Example as child view controller" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="69z-fc-CSH">
+                                <rect key="frame" x="51" y="36" width="245" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xfi-CB-Z6h">
+                                <rect key="frame" x="20" y="80.5" width="560" height="470.5"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="69z-fc-CSH" firstAttribute="leading" secondItem="PqO-lb-kbF" secondAttribute="leadingMargin" constant="20" id="3D7-Ld-BvO"/>
+                            <constraint firstItem="xfi-CB-Z6h" firstAttribute="top" secondItem="69z-fc-CSH" secondAttribute="bottom" constant="20" id="9cv-UV-VhX"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="69z-fc-CSH" secondAttribute="trailing" constant="20" id="NhN-e0-h3y"/>
+                            <constraint firstItem="69z-fc-CSH" firstAttribute="top" secondItem="MvS-nE-ygA" secondAttribute="bottom" constant="20" id="YDh-cF-gqM"/>
+                            <constraint firstItem="xfi-CB-Z6h" firstAttribute="leading" secondItem="PqO-lb-kbF" secondAttribute="leadingMargin" id="aLY-Wc-epg"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="xfi-CB-Z6h" secondAttribute="trailing" id="bCF-KJ-t6u"/>
+                            <constraint firstItem="7BL-hD-WbZ" firstAttribute="top" secondItem="xfi-CB-Z6h" secondAttribute="bottom" id="xmi-7S-pQ5"/>
+                        </constraints>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Item" id="ZjN-ui-roR"/>
+                    <connections>
+                        <outlet property="scrollContainer" destination="xfi-CB-Z6h" id="Ivt-gQ-byO"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xuf-5S-7tn" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1364" y="-918"/>
+        </scene>
+        <!--Item-->
         <scene sceneID="9Sx-UF-wCB">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="4RN-Ta-q1B" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Item" id="g5f-Z2-Vit"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="dYd-VZ-m9s">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
@@ -39,6 +84,24 @@
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="WOr-th-zxc" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1341" y="-203"/>
+        </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="wPv-5Z-9mJ">
+            <objects>
+                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="TWd-Ha-pRO" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" id="WAE-us-u6z">
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="4RN-Ta-q1B" kind="relationship" relationship="viewControllers" id="ZPa-eo-vC0"/>
+                        <segue destination="Uuv-ax-Dy0" kind="relationship" relationship="viewControllers" id="JWI-NI-k64"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="o3J-p8-0RR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="529" y="-203"/>
         </scene>
