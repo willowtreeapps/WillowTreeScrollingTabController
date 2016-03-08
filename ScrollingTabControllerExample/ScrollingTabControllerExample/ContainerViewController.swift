@@ -12,14 +12,18 @@ import ScrollingTabController
 class ContainerViewController: UIViewController {
 
     var scrollTab = ScrollingTabController()
+    
+    var viewControllers: [UIViewController] = []
+    
     @IBOutlet var scrollContainer: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        buildViewControllers()
         scrollTab.willMoveToParentViewController(self)
         addChildViewController(scrollTab)
-        buildViewControllers()
+        scrollTab.viewControllers = viewControllers
         scrollTab.view.translatesAutoresizingMaskIntoConstraints = false
         
         scrollContainer.addSubview(scrollTab.view)
@@ -30,7 +34,7 @@ class ContainerViewController: UIViewController {
         
         scrollTab.didMoveToParentViewController(self)
         
-        scrollTab.tabView.sizeTabsToFitWidth = true
+        scrollTab.tabView.tabSizing = .fitViewFrameWidth
         // Do any additional setup after loading the view.
     }
     
@@ -57,7 +61,7 @@ class ContainerViewController: UIViewController {
             viewController.itemTextLabel.text = "\(i)"
             viewController.tabBarItem.title = "VC \(i)"
             
-            scrollTab.viewControllers.append(viewController)
+            viewControllers.append(viewController)
         }
     }
 }

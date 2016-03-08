@@ -44,6 +44,12 @@ In addition, even more customization of the tab bar itself can be had by accessi
 * ```classForCell``` - Custom class to use for the tabs
 * ```classForDivider``` - Custom decorator view to use for tab separators
 
+## Changes
+
+### 0.0.3
+
+* Breaking API change of removing the data source delegate to the scrolling controller. This was not used heavily and lead to confusion. The new API is much more in-line with UITabBarController
+
 ## Contributing / Questions
 
 We are always open to contributions and pull requests on GitHub. Please follow us at @willowtreeapps on Twitter or http://www.willowtreeapps.com

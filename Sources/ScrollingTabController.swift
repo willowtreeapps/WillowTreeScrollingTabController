@@ -24,79 +24,7 @@
 
 import UIKit
 
-/**
- * Protocol used to provide data to the tab portion of the ScrollingTabController.
- */
-public protocol TabDataSource: class {
-    
-    /**
-     * Returns the number of items in the tab view.
-     *
-     * - Parameter tabView: the tab controller requesting the tab count
-     *
-     * - Returns: An optional integer value representing the number of items in the tab view
-     */
-    func numberOfItemsInTabView(tabView: ScrollingTabController) -> Int?
-    
-    /**
-     * Returns the view controller for the specified view index.
-     *
-     * - Parameter tabView: the tab controller requesting the tab count
-     * - Parameter viewControllerAtIndex: the index for the requested view controller
-     *
-     * - Returns: The view controller at the specified index or nil if not found
-     */
-    func tabView(tabView: ScrollingTabController, viewControllerAtIndex index: Int) -> UIViewController?
-    
-    /**
-     * Configures the tab cell at the specified index.
-     *
-     * - Parameter tabView: the tab controller requesting the cell configuration
-     * - Parameter configureTitleCell: the UICollectionViewCell to configure
-     * - Parameter atIndex: the index of the cell to configure
-     *
-     * - Returns: The configured collection view cell
-     */
-    func tabView(tabView: ScrollingTabController, configureTitleCell cell: UICollectionViewCell, atIndex index: Int) -> UICollectionViewCell?
-    
-    /**
-     * Returns the width for a specific tab cell at a given index.
-     *
-     * - Parameter tabView: the tab controller requesting the cell width
-     * - Parameter widthForCellAtIndex: the index of the cell to return the width for
-     *
-     * - Returns: The width of the cell at the index path.  Default nil (equal widths)
-     */
-    func tabView(tabView: ScrollingTabController, widthForCellAtIndex index: Int) -> CGFloat?
-}
-
-/**
- * Default protocol extension
- */
-public extension TabDataSource {
-    
-    func numberOfItemsInTabView(tabView: ScrollingTabController) -> Int? {
-        return nil;
-    }
-    
-    func tabView(tabView: ScrollingTabController, viewControllerAtIndex index: Int) -> UIViewController?
-    {
-        return nil
-    }
-    
-    func tabView(tabView: ScrollingTabController, configureTitleCell cell: UICollectionViewCell, atIndex index: Int) -> UICollectionViewCell?
-    {
-        return nil
-    }
-    
-    func tabView(tabView: ScrollingTabController, widthForCellAtIndex index: Int) -> CGFloat?
-    {
-        return nil
-    }
-    
-}
-
-/**
+/*
  * Provides a common container view that has a collection view of tabs at the top, with a
  * container collection view at the bottom.
  */
@@ -105,29 +33,27 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     /// The top ScrollingTabView
     public var tabView = ScrollingTabView()
     
-    /// Array of the view controllers that are contained in the bottom view controller
+    /// Array of the view controllers that are contained in the bottom view controller. Please note
+    /// that if the data source is set, this array is no longer used.
     public var viewControllers = [UIViewController]() {
         didSet {
-            if self.tabControllersView != nil {
-                self.configureViewControllers()
+            if tabControllersView != nil {
+                configureViewControllers()
             }
         }
     }
     
-    /// Data source for the tab controller
-    @IBInspectable public weak var dataSource: TabDataSource?
-    
     /// Specifies if the tab view should size the width of the tabs to their content.
-    public var sizeTabItemsToFit: Bool = false {
+    public var tabSizing: ScrollingTabView.TabSizing = .fitViewFrameWidth {
         didSet {
-            self.tabView.sizeTabsToFitWidth = sizeTabItemsToFit
+            tabView.tabSizing = tabSizing
         }
     }
     
     /// Specifies if the selected tab item should remain centered within the containing view.
     public var centerSelectTabs: Bool = false {
         didSet {
-            self.tabView.centerSelectTabs = centerSelectTabs
+            tabView.centerSelectTabs = centerSelectTabs
         }
     }
     
@@ -149,57 +75,52 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     
     typealias TabItem = (container: UIView, controller: UIViewController)
     var items = [TabItem]()
-    
+
+    static private var sizingCell = ScrollingTabCell(frame: CGRectMake(0, 0, 9999.0, 30.0))
+
     private let contentSizeKeyPath = "contentSize"
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.tabControllersView = UIScrollView()
-        self.automaticallyAdjustsScrollViewInsets = false
+        tabControllersView = UIScrollView()
+        tabControllersView.showsHorizontalScrollIndicator = false
+        tabControllersView.showsVerticalScrollIndicator = false
+        automaticallyAdjustsScrollViewInsets = false
         
-        self.tabControllersView.delegate = self
-        self.tabControllersView.pagingEnabled = true
-        self.tabControllersView.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(self.tabControllersView)
-        
-        self.tabView.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(self.tabView)
-        var tabConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|[tabBar]|", options: NSLayoutFormatOptions.init(rawValue: 0), metrics: nil, views: ["tabBar": self.tabView])
-        
-        tabConstraints.appendContentsOf(NSLayoutConstraint.constraintsWithVisualFormat("V:[topGuide][tabBar]", options: NSLayoutFormatOptions.init(rawValue: 0), metrics: nil, views: ["topGuide": self.topLayoutGuide, "tabBar": self.tabView]))
-        let height = NSLayoutConstraint(item: self.tabView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 44.0)
-        self.tabView.addConstraint(height)
-        self.view.addConstraints(tabConstraints)
-        
-        let horizontalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|[tabControllersView]|", options: NSLayoutFormatOptions.init(rawValue: 0), metrics: nil, views: ["tabControllersView": self.tabControllersView])
-        let verticalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("V:[tabBar][tabControllersView]|", options:  NSLayoutFormatOptions.init(rawValue: 0), metrics: nil, views: ["tabBar": self.tabView, "tabControllersView": self.tabControllersView])
-        
-        self.view.addConstraints(horizontalConstraints)
-        self.view.addConstraints(verticalConstraints)
-        
+        tabControllersView.delegate = self
+        tabControllersView.pagingEnabled = true
+        tabControllersView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(tabControllersView)
+
+        tabView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(tabView)
+        var tabConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|[tabBar]|", options: [], metrics: nil, views: ["tabBar": tabView])
+
+        tabConstraints.appendContentsOf(NSLayoutConstraint.constraintsWithVisualFormat("V:[topGuide][tabBar]", options:[], metrics: nil, views: ["topGuide": topLayoutGuide, "tabBar": tabView]))
+        let height = NSLayoutConstraint(item: tabView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 44.0)
+        tabView.addConstraint(height)
+        view.addConstraints(tabConstraints)
+
+        let horizontalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|[tabControllersView]|", options: [], metrics: nil, views: ["tabControllersView": tabControllersView])
+        let verticalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("V:[tabBar][tabControllersView]|", options:  [], metrics: nil, views: ["tabBar": tabView, "tabControllersView": tabControllersView])
+
+        view.addConstraints(horizontalConstraints)
+        view.addConstraints(verticalConstraints)
+
         tabControllersView.addObserver(self, forKeyPath: contentSizeKeyPath, options: NSKeyValueObservingOptions(rawValue: 0), context: nil)
         
-        tabView.collectionView.registerClass(ScrollingTabCell.classForCoder(), forCellWithReuseIdentifier: "TabCell")
         tabView.collectionView.delegate = self
         tabView.collectionView.dataSource = self
         
-        self.configureViewControllers()
+        configureViewControllers()
         reloadData()
-        
-        self.loadTab(0)
+        loadTab(0)
     }
-    
-    override public func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        if self.sizeTabItemsToFit {
-            self.tabView.calculateItemSizeToFitWidth(self.view.frame.size.width)
-        }
-    }
-    
+
     override public func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        self.tabView.panToPercentage(scrolledPercentage)
+        tabView.panToPercentage(scrolledPercentage)
     }
     
     /// Listen to the contentSize changing in order to provide a smooth animation during rotation.
@@ -208,7 +129,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     }
 
     func configureViewControllers() {
-        for item in self.items {
+        for item in items {
             let child = item.controller
             child.willMoveToParentViewController(nil)
             child.view.removeFromSuperview()
@@ -216,26 +137,26 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
             item.container.removeFromSuperview()
         }
         
-        for viewController in self.viewControllers {
-            self.items.append(TabItem(self.addTabContainer(), viewController))
+        for viewController in viewControllers {
+            items.append(TabItem(addTabContainer(), viewController))
         }
     }
     
     func addTabContainer() -> UIView {
-        let firstTab = (self.items.count == 0)
+        let firstTab = (items.count == 0)
         
         let container = UIView()
         container.translatesAutoresizingMaskIntoConstraints = false
         let width = NSLayoutConstraint(item: container, attribute: .Width, relatedBy: .Equal, toItem: view, attribute: .Width, multiplier: 1.0, constant: 0.0)
-        let height = NSLayoutConstraint(item: container, attribute: .Height, relatedBy: .Equal, toItem: self.tabControllersView, attribute: .Height, multiplier: 1.0, constant: 0.0)
-        let top = NSLayoutConstraint(item: container, attribute: .Top, relatedBy: .Equal, toItem: self.tabControllersView, attribute: .Top, multiplier: 1.0, constant: 0.0)
+        let height = NSLayoutConstraint(item: container, attribute: .Height, relatedBy: .Equal, toItem: tabControllersView, attribute: .Height, multiplier: 1.0, constant: 0.0)
+        let top = NSLayoutConstraint(item: container, attribute: .Top, relatedBy: .Equal, toItem: tabControllersView, attribute: .Top, multiplier: 1.0, constant: 0.0)
         let left: NSLayoutConstraint
         if firstTab {
-            left = NSLayoutConstraint(item: container, attribute: .Left, relatedBy: .Equal, toItem: self.tabControllersView, attribute: .Left, multiplier: 1.0, constant: 0.0)
+            left = NSLayoutConstraint(item: container, attribute: .Left, relatedBy: .Equal, toItem: tabControllersView, attribute: .Left, multiplier: 1.0, constant: 0.0)
         } else {
             left = NSLayoutConstraint(item: container, attribute: .Left, relatedBy: .Equal, toItem: items.last!.container, attribute: .Right, multiplier: 1.0, constant: 0.0)
         }
-        let right = NSLayoutConstraint(item: container, attribute: .Right, relatedBy: .Equal, toItem: self.tabControllersView, attribute: .Right, multiplier: 1.0, constant: 0.0)
+        let right = NSLayoutConstraint(item: container, attribute: .Right, relatedBy: .Equal, toItem: tabControllersView, attribute: .Right, multiplier: 1.0, constant: 0.0)
         
         if tabControllersViewRightConstraint != nil {
             tabControllersViewRightConstraint!.active = false
@@ -272,25 +193,18 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         }
         
         let container = items[index].container
-        
-        var childViewController = self.dataSource?.tabView(self, viewControllerAtIndex: index)
-        
-        if childViewController == nil {
-            childViewController = items[index].controller
-        }
+        let child = items[index].controller
 
-        if let child = childViewController {
-            child.view.translatesAutoresizingMaskIntoConstraints = false
-            let width = NSLayoutConstraint(item: child.view, attribute: .Width, relatedBy: .Equal, toItem: container, attribute: .Width, multiplier: 1.0, constant: 0.0)
-            let height = NSLayoutConstraint(item: child.view, attribute: .Height, relatedBy: .Equal, toItem: container, attribute: .Height, multiplier: 1.0, constant: 0.0)
-            let top = NSLayoutConstraint(item: child.view, attribute: .Top, relatedBy: .Equal, toItem: container, attribute: .Top, multiplier: 1.0, constant: 0.0)
-            let left = NSLayoutConstraint(item: child.view, attribute: .Left, relatedBy: .Equal, toItem: container, attribute: .Left, multiplier: 1.0, constant: 0.0)
-            
-            self.addChildViewController(child)
-            container.addSubview(child.view)
-            NSLayoutConstraint.activateConstraints([width, height, top, left])
-            child.didMoveToParentViewController(self)
-        }
+        child.view.translatesAutoresizingMaskIntoConstraints = false
+        let width = NSLayoutConstraint(item: child.view, attribute: .Width, relatedBy: .Equal, toItem: container, attribute: .Width, multiplier: 1.0, constant: 0.0)
+        let height = NSLayoutConstraint(item: child.view, attribute: .Height, relatedBy: .Equal, toItem: container, attribute: .Height, multiplier: 1.0, constant: 0.0)
+        let top = NSLayoutConstraint(item: child.view, attribute: .Top, relatedBy: .Equal, toItem: container, attribute: .Top, multiplier: 1.0, constant: 0.0)
+        let left = NSLayoutConstraint(item: child.view, attribute: .Left, relatedBy: .Equal, toItem: container, attribute: .Left, multiplier: 1.0, constant: 0.0)
+        
+        addChildViewController(child)
+        container.addSubview(child.view)
+        NSLayoutConstraint.activateConstraints([width, height, top, left])
+        child.didMoveToParentViewController(self)
     }
     
     func unloadTab(index: Int) {
@@ -317,9 +231,9 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     }
     
     func reloadData() {
-        self.tabView.collectionView.reloadData()
-        if self.items.count > 0 {
-            self.tabView.collectionView.selectItemAtIndexPath(NSIndexPath(forItem: 0, inSection: 0), animated: false, scrollPosition: .None)
+        tabView.collectionView.reloadData()
+        if items.count > 0 {
+            tabView.collectionView.selectItemAtIndexPath(NSIndexPath(forItem: 0, inSection: 0), animated: false, scrollPosition: .None)
         }
     }
     
@@ -328,40 +242,40 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     }
     
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        
-        if let count = self.dataSource?.numberOfItemsInTabView(self) {
-            return count
-        }
-        
-        return self.items.count
+        return items.count
     }
     
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("TabCell", forIndexPath: indexPath) as! ScrollingTabCell
-        
-        let configuredCell = self.dataSource?.tabView(self, configureTitleCell: cell, atIndex: indexPath.item)
-        
-        if configuredCell == nil {
-            let viewController = viewControllers[indexPath.item]
-            cell.titleLabel.text = viewController.tabBarItem.title
+        guard let cell = collectionView.dequeueReusableCellWithReuseIdentifier("TabCell", forIndexPath: indexPath) as? ScrollingTabCell else {
+            fatalError("Class for tab cells must be a subclass of the scrolling tab cell")
         }
         
+        let viewController = viewControllers[indexPath.item]
+        cell.title = viewController.tabBarItem.title
+
         return cell
     }
     
     public func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        
-        let height = CGRectGetHeight(collectionView.frame)
 
-        if let width = self.dataSource?.tabView(self, widthForCellAtIndex: indexPath.item) {
-            return CGSizeMake(width, height)
-        } else {
+        switch tabSizing {
+        case .fitViewFrameWidth, .fixedSize(_):
             if let flowLayout = collectionViewLayout as? UICollectionViewFlowLayout {
                 return flowLayout.itemSize
             }
+        case .sizeToContent:
+
+            ScrollingTabController.sizingCell.frame.size = CGSizeMake(9999.0, tabView.frame.height)
+            ScrollingTabController.sizingCell.contentView.frame = ScrollingTabController.sizingCell.bounds
             
-            return CGSizeMake(100.0, height)
+            ScrollingTabController.sizingCell.title = viewControllers[indexPath.row].tabBarItem.title
+            ScrollingTabController.sizingCell.layoutIfNeeded()
+            
+            let size = ScrollingTabController.sizingCell.contentView.systemLayoutSizeFittingSize(UILayoutFittingCompressedSize)
+            return CGSizeMake(size.width, tabView.frame.height)
         }
+
+        return CGSizeMake(100.0, tabView.frame.height)
     }
     
     public func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
@@ -383,8 +297,11 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         updatingCurrentPage = false
 
         coordinator.animateAlongsideTransition({ _ in
-            if self.sizeTabItemsToFit {
+            switch self.tabSizing {
+            case .fitViewFrameWidth:
                 self.tabView.calculateItemSizeToFitWidth(size.width)
+            default:
+                break
             }
 
             }, completion: { context in
@@ -418,20 +335,20 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         }
         
         if scrollView.tracking {
-            self.checkAndLoadPages()
+            checkAndLoadPages()
         }
         
-        self.tabView.panToPercentage(scrolledPercentage)
+        tabView.panToPercentage(scrolledPercentage)
     }
     
     public func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if !decelerate {
-            self.checkAndLoadPages()
+            checkAndLoadPages()
         }
     }
     
     public func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-        self.checkAndLoadPages()
+        checkAndLoadPages()
     }
     
     public func scrollViewDidEndScrollingAnimation(scrollView: UIScrollView) {
@@ -442,7 +359,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         // When scrolling with animation, not all items may be captured in the loadedPages interval.
         // This clears out any remaining views left on the scrollview.
         for index in 0..<items.count {
-            self.unloadTab(index)
+            unloadTab(index)
         }
     }
     
@@ -462,7 +379,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     }
     
     func inRange(index: Int) -> Bool {
-        return index >= 0 && index < self.items.count
+        return index >= 0 && index < items.count
     }
 }
 

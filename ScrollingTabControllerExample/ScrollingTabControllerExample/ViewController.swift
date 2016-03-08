@@ -27,14 +27,13 @@
 import UIKit
 import ScrollingTabController
 
-class ViewController: ScrollingTabController, TabDataSource {
+class ViewController: ScrollingTabController {
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
         self.buildViewControllers()
-        self.dataSource = self
-//        self.sizeTabItemsToFit = true
+        self.tabSizing = .sizeToContent
         self.tabView.centerSelectTabs = true
     }
     
@@ -42,37 +41,31 @@ class ViewController: ScrollingTabController, TabDataSource {
         for i in 1...10 {
             let viewController = TestingViewController()
             
+            viewController.tabBarItem.title = "VC \(i)"
+            viewController.itemTextLabel.text = "\(i)"
+            
             var color = UIColor.whiteColor()
             switch i % 5 {
             case 0:
                 color = UIColor.redColor()
             case 1:
                 color = UIColor.blueColor()
+                viewController.tabBarItem.title = "REALLY LONG VC NAME \(i)"
             case 2:
                 color = UIColor.greenColor()
             case 3:
                 color = UIColor.orangeColor()
             case 4:
                 color = UIColor.purpleColor()
+                viewController.tabBarItem.title = "LONG VC NAME \(i)"
             default:
                 color = UIColor.whiteColor()
             }
             viewController.view.backgroundColor = color
-            viewController.itemTextLabel.text = "\(i)"
-            viewController.tabBarItem.title = "VC \(i)"
+            
             
             self.viewControllers.append(viewController)
         }
-    }
-    
-    internal func tabView(tabView: ScrollingTabController, configureTitleCell cell: UICollectionViewCell, atIndex index: Int) -> UICollectionViewCell {
-        guard let tabCell = cell as? ScrollingTabCell else {
-            return cell
-        }
-        
-        tabCell.titleLabel.text = "Item \(index)"
-        
-        return tabCell
     }
 }
 

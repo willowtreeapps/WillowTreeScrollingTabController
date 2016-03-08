@@ -33,45 +33,52 @@ public class ScrollingTabCell: UICollectionViewCell {
     /// Title label shown in the cell.
     public var titleLabel: UILabel!
     
+    public var title: String? {
+        didSet {
+            titleLabel.text = title
+        }
+    }
+    
     public override var selected: Bool {
         didSet {
             if selected {
-                self.titleLabel.textColor = self.tintColor
+                titleLabel.textColor = tintColor
             } else {
-                self.titleLabel.textColor = UIColor.darkTextColor()
+                titleLabel.textColor = UIColor.darkTextColor()
             }
         }
     }
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
-        self.setup()
+        setup()
     }
     
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        self.setup()
+        setup()
     }
     
     func setup() {
         
-        self.backgroundColor = UIColor.clearColor()
+        backgroundColor = UIColor.clearColor()
         
-        self.titleLabel = UILabel()
-        self.titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        self.titleLabel.textAlignment = .Center
-        self.contentView.addSubview(self.titleLabel)
+        titleLabel = UILabel()
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.textAlignment = .Center
+        contentView.addSubview(titleLabel)
         
         let horizontalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|-[view]-|",
             options: NSLayoutFormatOptions(rawValue:0),
             metrics: nil,
-            views: ["view": self.titleLabel])
+            views: ["view": titleLabel])
         let verticalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("V:|-[view]-|",
             options: NSLayoutFormatOptions(rawValue:0),
             metrics: nil,
-            views: ["view": self.titleLabel])
+            views: ["view": titleLabel])
+        titleLabel.setContentHuggingPriority(UILayoutPriorityRequired, forAxis: .Horizontal)
         
-        self.contentView.addConstraints(horizontalConstraints)
-        self.contentView.addConstraints(verticalConstraints)
+        contentView.addConstraints(horizontalConstraints)
+        contentView.addConstraints(verticalConstraints)
     }
 }
