@@ -12,7 +12,6 @@
 		036542AD1C2202B300F57B4F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 036542A61C2202B300F57B4F /* ViewController.swift */; };
 		036542AE1C2202B300F57B4F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 036542A71C2202B300F57B4F /* Assets.xcassets */; };
 		036542B31C22032200F57B4F /* ScrollingTabController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 036542B21C22032200F57B4F /* ScrollingTabController.framework */; };
-		036542B41C22085B00F57B4F /* Base.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 036542A81C2202B300F57B4F /* Base.lproj */; };
 		036542DE1C22097E00F57B4F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 036542DC1C22097E00F57B4F /* LaunchScreen.storyboard */; };
 		036542E01C220B2900F57B4F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 036542E21C220B2900F57B4F /* Main.storyboard */; };
 /* End PBXBuildFile section */
@@ -35,7 +34,6 @@
 		036542A51C2202B300F57B4F /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = ScrollingTabControllerExample/AppDelegate.swift; sourceTree = "<group>"; };
 		036542A61C2202B300F57B4F /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewController.swift; path = ScrollingTabControllerExample/ViewController.swift; sourceTree = "<group>"; };
 		036542A71C2202B300F57B4F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ScrollingTabControllerExample/Assets.xcassets; sourceTree = "<group>"; };
-		036542A81C2202B300F57B4F /* Base.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Base.lproj; path = /Users/erik/dev/WillowTreeScrollingTabController/ScrollingTabControllerExample/ScrollingTabControllerExample/Base.lproj; sourceTree = "<absolute>"; };
 		036542A91C2202B300F57B4F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ScrollingTabControllerExample/Info.plist; sourceTree = "<group>"; };
 		036542AA1C2202B300F57B4F /* ScrollingTabControllerExampleTests */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ScrollingTabControllerExampleTests; sourceTree = "<group>"; };
 		036542B21C22032200F57B4F /* ScrollingTabController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScrollingTabController.framework; path = "../../../Library/Developer/Xcode/DerivedData/ScrollingTabControllerExample-gkjnmycpmmfxtubjanszeptrkcep/Build/Products/Debug-iphoneos/ScrollingTabController.framework"; sourceTree = "<group>"; };
@@ -162,7 +160,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				036542DE1C22097E00F57B4F /* LaunchScreen.storyboard in Resources */,
-				036542B41C22085B00F57B4F /* Base.lproj in Resources */,
 				036542AE1C2202B300F57B4F /* Assets.xcassets in Resources */,
 				036542E01C220B2900F57B4F /* Main.storyboard in Resources */,
 			);
