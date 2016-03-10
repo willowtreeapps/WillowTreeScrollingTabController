@@ -60,7 +60,7 @@ public class ScrollingTabView: UIView {
     }
     
     /// Specifies the edge insets of the selection indicator to the cells.  Defaults to 0 insets.
-    public var selectionIndicatorEdgeInsets: UIEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0)
+    public var selectionIndicatorEdgeInsets: UIEdgeInsets = UIEdgeInsetsZero
     
     /// Specifies if the tabs should size to fit their content
     public var sizeTabsToFitWidth: Bool = false {
@@ -102,8 +102,6 @@ public class ScrollingTabView: UIView {
     var selectionIndicatorHeightConstraint: NSLayoutConstraint!
     var selectionIndicatorWidthConstraint: NSLayoutConstraint!
     
-    private var lastPercentage: CGFloat = 0
-    
     override public init(frame: CGRect) {
         super.init(frame: frame)
         self.setup()
@@ -135,7 +133,6 @@ public class ScrollingTabView: UIView {
         
         NSLayoutConstraint.activateConstraints(horizontalContstraints)
         NSLayoutConstraint.activateConstraints(verticalConstraints)
-        
         
         self.selectionIndicator = UIView()
         self.selectionIndicator.translatesAutoresizingMaskIntoConstraints = false
@@ -169,8 +166,6 @@ public class ScrollingTabView: UIView {
     
     public func panToPercentage(percentage: CGFloat) {
         
-        lastPercentage = percentage
-        
         let tabCount = self.collectionView.numberOfItemsInSection(0)
         let percentageInterval = CGFloat(1.0 / Double(tabCount))
         
@@ -201,7 +196,6 @@ public class ScrollingTabView: UIView {
                 secondPath = NSIndexPath(forItem: Int(secondItem), inSection: 0)
             }
         }
-        
         
         let shareSecond = percentage + percentageInterval - CGFloat(secondItem) * percentageInterval
         let shareFirst = percentageInterval - shareSecond
@@ -235,7 +229,6 @@ public class ScrollingTabView: UIView {
                 if (x < self.collectionView.contentSize.width - (CGRectGetWidth(self.frame) / 2.0) - (width / 2.0)) {
                     self.collectionView.contentOffset = CGPointMake(x - (CGRectGetWidth(self.frame) / 2 - width / 2.0), 0)
                 }
-            
             }
         }
     }

@@ -28,7 +28,7 @@ import UIKit
  * Protocol used to provide data to the tab portion of the ScrollingTabController.
  */
 public protocol TabDataSource: class {
-  
+    
     /**
      * Returns the number of items in the tab view.
      *
@@ -38,12 +38,12 @@ public protocol TabDataSource: class {
      */
     func numberOfItemsInTabView(tabView: ScrollingTabController) -> Int?
     
-    /** 
+    /**
      * Returns the view controller for the specified view index.
      *
      * - Parameter tabView: the tab controller requesting the tab count
      * - Parameter viewControllerAtIndex: the index for the requested view controller
-     * 
+     *
      * - Returns: The view controller at the specified index or nil if not found
      */
     func tabView(tabView: ScrollingTabController, viewControllerAtIndex index: Int) -> UIViewController?
@@ -93,7 +93,7 @@ public extension TabDataSource {
     {
         return nil
     }
-
+    
 }
 
 /**
@@ -131,10 +131,15 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         }
     }
     
+    /// The current scrolled percentage
+    var scrolledPercentage: CGFloat {
+        return self.tabControllersView.contentOffset.x / tabControllersView.contentSize.width
+    }
+    
     var viewControllerCache = NSCache()
     var tabControllersView: UIScrollView!
     var jumpScroll = false
-
+    
     var currentPage: Int = 0
     var updatingCurrentPage = true
     var loadedPages = HalfOpenInterval<Int>(0, 0)
@@ -161,15 +166,15 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         self.tabView.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(self.tabView)
         var tabConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|[tabBar]|", options: NSLayoutFormatOptions.init(rawValue: 0), metrics: nil, views: ["tabBar": self.tabView])
-
+        
         tabConstraints.appendContentsOf(NSLayoutConstraint.constraintsWithVisualFormat("V:[topGuide][tabBar]", options: NSLayoutFormatOptions.init(rawValue: 0), metrics: nil, views: ["topGuide": self.topLayoutGuide, "tabBar": self.tabView]))
         let height = NSLayoutConstraint(item: self.tabView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 44.0)
         self.tabView.addConstraint(height)
         self.view.addConstraints(tabConstraints)
-
+        
         let horizontalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|[tabControllersView]|", options: NSLayoutFormatOptions.init(rawValue: 0), metrics: nil, views: ["tabControllersView": self.tabControllersView])
         let verticalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("V:[tabBar][tabControllersView]|", options:  NSLayoutFormatOptions.init(rawValue: 0), metrics: nil, views: ["tabBar": self.tabView, "tabControllersView": self.tabControllersView])
-
+        
         self.view.addConstraints(horizontalConstraints)
         self.view.addConstraints(verticalConstraints)
         
@@ -181,7 +186,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         
         self.configureViewControllers()
         reloadData()
-
+        
         self.loadTab(0)
     }
     
@@ -190,12 +195,11 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         if self.sizeTabItemsToFit {
             self.tabView.calculateItemSizeToFitWidth(self.view.frame.size.width)
         }
-
     }
     
     override public func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        self.tabView.panToPercentage(0)
+        self.tabView.panToPercentage(scrolledPercentage)
     }
     
     /// Listen to the contentSize changing in order to provide a smooth animation during rotation.
@@ -274,7 +278,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         if childViewController == nil {
             childViewController = items[index].controller
         }
-       
+
         if let child = childViewController {
             child.view.translatesAutoresizingMaskIntoConstraints = false
             let width = NSLayoutConstraint(item: child.view, attribute: .Width, relatedBy: .Equal, toItem: container, attribute: .Width, multiplier: 1.0, constant: 0.0)
@@ -384,9 +388,8 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
             }
 
             }, completion: { context in
-            self.updatingCurrentPage = true
-            let percentage = self.tabControllersView.contentOffset.x / self.tabControllersView.contentSize.width;
-            self.tabView.panToPercentage(percentage)
+                self.updatingCurrentPage = true
+                self.tabView.panToPercentage(self.scrolledPercentage)
         })
     }
     
@@ -395,7 +398,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         let page = Int(tabControllersView.contentOffset.x / width)
         if page != currentPage {
             currentPage = page
-
+            
             for offset in 0...(numToPreload + 1) {
                 lazyLoad(page - offset)
                 if offset > 0 {
@@ -403,8 +406,8 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
                 }
             }
         }
-
     }
+    
     public func scrollViewDidScroll(scrollView: UIScrollView) {
         guard scrollView == tabControllersView else {
             return
@@ -418,8 +421,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
             self.checkAndLoadPages()
         }
         
-        let percentage = scrollView.contentOffset.x / scrollView.contentSize.width;
-        self.tabView.panToPercentage(percentage)
+        self.tabView.panToPercentage(scrolledPercentage)
     }
     
     public func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
@@ -435,7 +437,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     public func scrollViewDidEndScrollingAnimation(scrollView: UIScrollView) {
         loadedPages = HalfOpenInterval<Int>(currentPage, currentPage)
         lazyLoad(currentPage)
-        self.jumpScroll = false
+        jumpScroll = false
         
         // When scrolling with animation, not all items may be captured in the loadedPages interval.
         // This clears out any remaining views left on the scrollview.
