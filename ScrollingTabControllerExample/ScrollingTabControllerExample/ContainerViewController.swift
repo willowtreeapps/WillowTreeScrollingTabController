@@ -12,14 +12,18 @@ import ScrollingTabController
 class ContainerViewController: UIViewController {
 
     var scrollTab = ScrollingTabController()
+    
+    var viewControllers: [UIViewController] = []
+    
     @IBOutlet var scrollContainer: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        buildViewControllers()
         scrollTab.willMoveToParentViewController(self)
         addChildViewController(scrollTab)
-        buildViewControllers()
+        scrollTab.viewControllers = viewControllers
         scrollTab.view.translatesAutoresizingMaskIntoConstraints = false
         
         scrollContainer.addSubview(scrollTab.view)
@@ -30,13 +34,8 @@ class ContainerViewController: UIViewController {
         
         scrollTab.didMoveToParentViewController(self)
         
-        scrollTab.tabView.sizeTabsToFitWidth = true
+        scrollTab.tabView.tabSizing = .fitViewFrameWidth
         // Do any additional setup after loading the view.
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     func buildViewControllers() {
@@ -62,19 +61,7 @@ class ContainerViewController: UIViewController {
             viewController.itemTextLabel.text = "\(i)"
             viewController.tabBarItem.title = "VC \(i)"
             
-            scrollTab.viewControllers.append(viewController)
+            viewControllers.append(viewController)
         }
     }
-
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
