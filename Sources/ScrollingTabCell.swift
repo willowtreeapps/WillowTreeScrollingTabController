@@ -49,6 +49,16 @@ public class ScrollingTabCell: UICollectionViewCell {
         }
     }
     
+    public override var highlighted: Bool {
+        didSet {
+            if highlighted {
+                titleLabel.textColor = tintColor
+            } else {
+                titleLabel.textColor = UIColor.darkTextColor()
+            }
+        }
+    }
+    
     public override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
