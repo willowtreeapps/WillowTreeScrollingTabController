@@ -82,7 +82,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         tabControllersView = UIScrollView()
         tabControllersView.showsHorizontalScrollIndicator = false
         tabControllersView.showsVerticalScrollIndicator = false
@@ -121,6 +121,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     override public func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         tabView.panToPercentage(scrolledPercentage)
+        self.tabView.collectionView.collectionViewLayout.invalidateLayout()
     }
     
     /// Listen to the contentSize changing in order to provide a smooth animation during rotation.
@@ -244,7 +245,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return items.count
     }
-    
+
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCellWithReuseIdentifier("TabCell", forIndexPath: indexPath) as? ScrollingTabCell else {
             fatalError("Class for tab cells must be a subclass of the scrolling tab cell")
@@ -263,8 +264,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
             if let flowLayout = collectionViewLayout as? UICollectionViewFlowLayout {
                 return flowLayout.itemSize
             }
-        case .sizeToContent:
-
+        case .flexibleWidth, .sizeToContent:
             ScrollingTabController.sizingCell.frame.size = CGSizeMake(9999.0, tabView.frame.height)
             ScrollingTabController.sizingCell.contentView.frame = ScrollingTabController.sizingCell.bounds
             
@@ -272,6 +272,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
             ScrollingTabController.sizingCell.layoutIfNeeded()
             
             let size = ScrollingTabController.sizingCell.contentView.systemLayoutSizeFittingSize(UILayoutFittingCompressedSize)
+
             return CGSizeMake(size.width, tabView.frame.height)
         }
 

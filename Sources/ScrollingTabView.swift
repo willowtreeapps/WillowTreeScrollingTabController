@@ -31,11 +31,13 @@ public let ScrollingTabTitleCell = "TabCell"
  * View that contains the top set of tabs and their containing collection view.
  */
 public class ScrollingTabView: UIView {
-    
+
     public enum TabSizing {
         case fitViewFrameWidth
         case fixedSize(CGFloat)
         case sizeToContent
+        ///Takes on the attributes of fitViewFrameWidth until the content is too large and then it takes on the attributes of sizeToContent
+        case flexibleWidth
     }
 
     /// Collection view containing the tabs
@@ -74,13 +76,24 @@ public class ScrollingTabView: UIView {
             switch tabSizing {
             case .fitViewFrameWidth:
                 calculateItemSizeToFitWidth(frame.width)
+                if let layout = collectionView.collectionViewLayout as? ScrollingTabViewFlowLayout {
+                    layout.flexibleWidth = false
+                }
             case .fixedSize(let width):
                 if let layout = collectionView.collectionViewLayout as? ScrollingTabViewFlowLayout {
                     layout.itemSize = CGSizeMake(width, layout.itemSize.height)
+                    layout.flexibleWidth = false
                     layout.invalidateLayout()
                 }
-            default:
+            case .flexibleWidth:
+                if let layout = collectionView.collectionViewLayout as? ScrollingTabViewFlowLayout {
+                    layout.flexibleWidth = true
+                }
                 // Delegate will handle sizing per cell.
+            default :
+                if let layout = collectionView.collectionViewLayout as? ScrollingTabViewFlowLayout {
+                    layout.flexibleWidth = false
+                }
                 break
             }
         }
@@ -180,7 +193,6 @@ public class ScrollingTabView: UIView {
     }
     
     public func panToPercentage(percentage: CGFloat) {
-
         lastPercentage = percentage
 
         let tabCount = collectionView.numberOfItemsInSection(0)
@@ -249,7 +261,7 @@ public class ScrollingTabView: UIView {
             }
         }
     }
-    
+
     func calculateItemSizeToFitWidth(width: CGFloat) {
         let numberOfItems = collectionView.numberOfItemsInSection(0)
 
@@ -287,7 +299,13 @@ public class ScrollingTabViewFlowLayout: UICollectionViewFlowLayout {
     
     /// Specifies if the divider is visible. Defaults to false.
     public var showDivider: Bool = false
-    
+
+    public var flexibleWidth : Bool = false {
+        didSet {
+            self.invalidateLayout()
+        }
+    }
+
     override init() {
         super.init()
         setup()
@@ -305,7 +323,7 @@ public class ScrollingTabViewFlowLayout: UICollectionViewFlowLayout {
         itemSize = CGSizeMake(100, 30.0)
         scrollDirection = .Horizontal
     }
-    
+
     override public func layoutAttributesForDecorationViewOfKind(elementKind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
         let attributes = layoutAttributesForItemAtIndexPath(indexPath)
         let dividerAttributes = UICollectionViewLayoutAttributes(forDecorationViewOfKind: ScrollingTabVerticalDividerType, withIndexPath: indexPath)
@@ -339,10 +357,54 @@ public class ScrollingTabViewFlowLayout: UICollectionViewFlowLayout {
                 }
             }
         }
+
+        if let collectionView = self.collectionView
+            where collectionView.contentSize.width < collectionView.frame.width
+                && flexibleWidth {
+            var index = 0
+            var attributesIndex = 0
+
+            let attributesCopy = updatedAttributes
+
+            for attribute in attributesCopy {
+                if attribute.representedElementCategory == .Cell {
+                    if let layoutAttributes = layoutAttributesForItemAtIndexPath(NSIndexPath(forItem: index, inSection: 0)) {
+                        updatedAttributes.removeAtIndex(attributesIndex)
+                        updatedAttributes.insert(layoutAttributes, atIndex: attributesIndex)
+                    }
+                    index++
+                }
+
+                attributesIndex++
+            }
+        }
         
         return updatedAttributes
     }
+
+    override public func layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
+        let attribute = super.layoutAttributesForItemAtIndexPath(indexPath)!
+
+        guard let collectionView = collectionView, let dataSource = collectionView.dataSource
+            where collectionView.contentSize.width < collectionView.frame.width
+                && flexibleWidth else {
+            return attribute
+        }
+
+        var frame = attribute.frame
+
+        let itemCount = dataSource.collectionView(collectionView, numberOfItemsInSection: 0)
+
+        frame.size.width = collectionView.frame.width / CGFloat(itemCount)
+        frame.origin.x = CGFloat(indexPath.row) * frame.size.width
+        attribute.frame = frame
+
+        return attribute;
+    }
+
+
 }
+
 
 public class ScrollingTabDivider: UICollectionReusableView {
     
