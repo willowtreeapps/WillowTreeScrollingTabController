@@ -30,7 +30,7 @@ class ContainerViewController: UIViewController {
     
         let horizontal = NSLayoutConstraint.constraintsWithVisualFormat("|[view]|", options: [], metrics: nil, views: ["view": scrollTab.view])
         let vertical = NSLayoutConstraint.constraintsWithVisualFormat("V:|[view]|", options: [], metrics: nil, views: ["view": scrollTab.view])
-        scrollContainer.addConstraints(horizontal + vertical)
+        NSLayoutConstraint.activateConstraints(horizontal + vertical)
         
         scrollTab.didMoveToParentViewController(self)
         

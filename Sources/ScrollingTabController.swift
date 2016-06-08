@@ -57,10 +57,10 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         }
     }
 
-    /// Specifies the height of the top tab bar. Defaults to 44.0 
+    /// Specifies the height of the top tab bar. Defaults to 44.0
     public var tabBarHeight: CGFloat = 44.0 {
         didSet {
-            if tabBarHeightConstraint == nil {
+            guard tabBarHeightConstraint != nil else {
                 return
             }
 
@@ -111,14 +111,11 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
 
         tabConstraints.appendContentsOf(NSLayoutConstraint.constraintsWithVisualFormat("V:[topGuide][tabBar]", options:[], metrics: nil, views: ["topGuide": topLayoutGuide, "tabBar": tabView]))
         tabBarHeightConstraint = NSLayoutConstraint(item: tabView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: tabBarHeight)
-        tabView.addConstraint(tabBarHeightConstraint)
-        view.addConstraints(tabConstraints)
 
         let horizontalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|[tabControllersView]|", options: [], metrics: nil, views: ["tabControllersView": tabControllersView])
         let verticalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("V:[tabBar][tabControllersView]|", options:  [], metrics: nil, views: ["tabBar": tabView, "tabControllersView": tabControllersView])
 
-        view.addConstraints(horizontalConstraints)
-        view.addConstraints(verticalConstraints)
+        NSLayoutConstraint.activateConstraints([tabBarHeightConstraint] + tabConstraints + horizontalConstraints + verticalConstraints)
 
         tabControllersView.addObserver(self, forKeyPath: contentSizeKeyPath, options: NSKeyValueObservingOptions(rawValue: 0), context: nil)
         
