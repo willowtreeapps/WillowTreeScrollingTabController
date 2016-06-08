@@ -49,6 +49,16 @@ public class ScrollingTabCell: UICollectionViewCell {
         }
     }
     
+    public override var highlighted: Bool {
+        didSet {
+            if highlighted {
+                titleLabel.textColor = tintColor
+            } else {
+                titleLabel.textColor = UIColor.darkTextColor()
+            }
+        }
+    }
+    
     public override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
@@ -77,8 +87,7 @@ public class ScrollingTabCell: UICollectionViewCell {
             metrics: nil,
             views: ["view": titleLabel])
         titleLabel.setContentHuggingPriority(UILayoutPriorityRequired, forAxis: .Horizontal)
-        
-        contentView.addConstraints(horizontalConstraints)
-        contentView.addConstraints(verticalConstraints)
+
+        NSLayoutConstraint.activateConstraints(horizontalConstraints + verticalConstraints)
     }
 }
