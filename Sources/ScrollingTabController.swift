@@ -56,6 +56,17 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
             tabView.centerSelectTabs = centerSelectTabs
         }
     }
+
+    /// Specifies the height of the top tab bar. Defaults to 44.0 
+    public var tabBarHeight: CGFloat = 44.0 {
+        didSet {
+            if tabBarHeightConstraint == nil {
+                return
+            }
+
+            tabBarHeightConstraint.constant = tabBarHeight
+        }
+    }
     
     /// The current scrolled percentage
     var scrolledPercentage: CGFloat {
@@ -79,6 +90,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     static private var sizingCell = ScrollingTabCell(frame: CGRectMake(0, 0, 9999.0, 30.0))
 
     private let contentSizeKeyPath = "contentSize"
+    private var tabBarHeightConstraint: NSLayoutConstraint!
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -98,8 +110,8 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         var tabConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|[tabBar]|", options: [], metrics: nil, views: ["tabBar": tabView])
 
         tabConstraints.appendContentsOf(NSLayoutConstraint.constraintsWithVisualFormat("V:[topGuide][tabBar]", options:[], metrics: nil, views: ["topGuide": topLayoutGuide, "tabBar": tabView]))
-        let height = NSLayoutConstraint(item: tabView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 44.0)
-        tabView.addConstraint(height)
+        tabBarHeightConstraint = NSLayoutConstraint(item: tabView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: tabBarHeight)
+        tabView.addConstraint(tabBarHeightConstraint)
         view.addConstraints(tabConstraints)
 
         let horizontalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|[tabControllersView]|", options: [], metrics: nil, views: ["tabControllersView": tabControllersView])
