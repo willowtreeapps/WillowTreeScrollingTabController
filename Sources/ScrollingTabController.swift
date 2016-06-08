@@ -60,11 +60,11 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     /// Specifies the height of the top tab bar. Defaults to 44.0
     public var tabBarHeight: CGFloat = 44.0 {
         didSet {
-            guard tabBarHeightConstraint != nil else {
+            guard let heightConstraint = tabBarHeightConstraint else {
                 return
             }
 
-            tabBarHeightConstraint.constant = tabBarHeight
+            heightConstraint.constant = tabBarHeight
         }
     }
     
