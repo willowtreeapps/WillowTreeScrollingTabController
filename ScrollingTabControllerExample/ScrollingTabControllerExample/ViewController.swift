@@ -61,7 +61,7 @@ class ViewController: ScrollingTabController {
             default:
                 color = UIColor.whiteColor()
             }
-            viewController.view.backgroundColor = color
+            viewController.backgroundColor = color
             
             
             self.viewControllers.append(viewController)
@@ -72,9 +72,13 @@ class ViewController: ScrollingTabController {
 class TestingViewController: UIViewController {
     
     var itemTextLabel = UILabel(frame: CGRectZero)
+    var backgroundColor: UIColor = UIColor.purpleColor()
 
     override func viewDidLoad() {
+        view.backgroundColor = backgroundColor
         self.view.addSubview(itemTextLabel)
+
+        print("Did Load \(itemTextLabel.text)")
         
         self.itemTextLabel.backgroundColor = UIColor(white: 1.0, alpha: 0.7)
         self.itemTextLabel.textColor = UIColor.blackColor()
@@ -88,6 +92,22 @@ class TestingViewController: UIViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        print("Will appear \(itemTextLabel.text)")
         usleep(1000)
+    }
+
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        print("Did appear \(itemTextLabel.text)")
+    }
+
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        print("Will disappear \(itemTextLabel.text)")
+    }
+
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        print("Did disappear \(itemTextLabel.text)")
     }
 }

@@ -82,6 +82,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     var jumpScroll = false
     
     var currentPage: Int = 0
+    var previousPage: Int = 0
     var updatingCurrentPage = true
     var loadedPages = HalfOpenInterval<Int>(0, 0)
     var numToPreload = 1
@@ -98,7 +99,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         tabControllersView = UIScrollView()
         tabControllersView.showsHorizontalScrollIndicator = false
         tabControllersView.showsVerticalScrollIndicator = false
@@ -131,9 +132,33 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         loadTab(0)
     }
 
+    override public func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+
+        childBeginAppearanceTransition(currentPage, isAppearing: true, animated: animated)
+    }
+
     override public func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
+        childEndAppearanceTransition(currentPage)
         tabView.panToPercentage(scrolledPercentage)
+    }
+
+    override public func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        childBeginAppearanceTransition(currentPage, isAppearing: false, animated: animated)
+    }
+
+    override public func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        childEndAppearanceTransition(currentPage)
+    }
+
+    public override func shouldAutomaticallyForwardAppearanceMethods() -> Bool {
+        // In order to send child view controllers the view(Will/Did)(Appear/Disappear) calls at the 
+        // correct times and only when the view controller is visible, we will fully control the 
+        // appearance calls.
+        return false
     }
     
     /// Listen to the contentSize changing in order to provide a smooth animation during rotation.
@@ -213,7 +238,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         let height = NSLayoutConstraint(item: child.view, attribute: .Height, relatedBy: .Equal, toItem: container, attribute: .Height, multiplier: 1.0, constant: 0.0)
         let top = NSLayoutConstraint(item: child.view, attribute: .Top, relatedBy: .Equal, toItem: container, attribute: .Top, multiplier: 1.0, constant: 0.0)
         let left = NSLayoutConstraint(item: child.view, attribute: .Left, relatedBy: .Equal, toItem: container, attribute: .Left, multiplier: 1.0, constant: 0.0)
-        
+
         addChildViewController(child)
         container.addSubview(child.view)
         NSLayoutConstraint.activateConstraints([width, height, top, left])
@@ -301,9 +326,16 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     }
     
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        // Tell the current view it is disappearing, scroll to the new page and tell that view 
+        // that it did appear
+        childBeginAppearanceTransition(currentPage, isAppearing: false, animated: true)
+        previousPage = currentPage
+
+        lazyLoad(indexPath.item)
+        childBeginAppearanceTransition(indexPath.item, isAppearing: true, animated: true)
         scrollToPage(indexPath.item, animate: true)
     }
-    
+
     override public func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
         
@@ -331,16 +363,47 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
 
         let page = Int(tabControllersView.contentOffset.x / width)
         if page != currentPage {
+
+            // Tell the former current page that it is going to disappear
+            childBeginAppearanceTransition(currentPage, isAppearing: false, animated: true)
+            childEndAppearanceTransition(currentPage)
+
             currentPage = page
             
             for offset in 0...(numToPreload + 1) {
-                lazyLoad(page - offset)
-                if offset > 0 {
-                    lazyLoad(page + offset)
-                }
+                lazyLoad(page + offset)
             }
+
+            // Tell the new current page that it will appear
+            childBeginAppearanceTransition(currentPage, isAppearing: true, animated: true)
+            childEndAppearanceTransition(currentPage)
         }
     }
+
+    /**
+    Begins an appearance transition of the current page of the scrolling tab bar
+    */
+    func childBeginAppearanceTransition(index: Int, isAppearing: Bool, animated: Bool) {
+        guard index >= 0 && index < viewControllers.count else {
+            return
+        }
+
+        let child = viewControllers[index]
+        child.beginAppearanceTransition(isAppearing, animated: animated)
+    }
+
+    /**
+    Completes an appearance transition of the current page of the scrolling tab bar
+    */
+    func childEndAppearanceTransition(index: Int) {
+        guard index >= 0 && index < viewControllers.count else {
+            return
+        }
+
+        let child = viewControllers[index]
+        child.endAppearanceTransition()
+    }
+
     
     public func scrollViewDidScroll(scrollView: UIScrollView) {
         guard scrollView == tabControllersView else {
@@ -372,6 +435,9 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         loadedPages = HalfOpenInterval<Int>(currentPage, currentPage)
         lazyLoad(currentPage)
         jumpScroll = false
+
+        childEndAppearanceTransition(currentPage)
+        childEndAppearanceTransition(previousPage)
         
         // When scrolling with animation, not all items may be captured in the loadedPages interval.
         // This clears out any remaining views left on the scrollview.
