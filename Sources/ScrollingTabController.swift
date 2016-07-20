@@ -70,6 +70,10 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     
     /// The current scrolled percentage
     var scrolledPercentage: CGFloat {
+        guard tabControllersView.contentSize.width > 0 else {
+            return 0
+        }
+
         return self.tabControllersView.contentOffset.x / tabControllersView.contentSize.width
     }
     
@@ -320,7 +324,11 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     }
     
     func checkAndLoadPages() {
-        let width = tabControllersView.frame.size.width
+        let width = tabControllersView.bounds.width
+        guard width > 0 else {
+            return
+        }
+
         let page = Int(tabControllersView.contentOffset.x / width)
         if page != currentPage {
             currentPage = page
