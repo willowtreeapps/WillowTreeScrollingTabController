@@ -46,6 +46,11 @@ In addition, even more customization of the tab bar itself can be had by accessi
 
 ## Changes
 
+### 0.0.4
+
+* Add support for changing the height of the tab bar.
+* Add support for cell highlighting.
+
 ### 0.0.3
 
 * Breaking API change of removing the data source delegate to the scrolling controller. This was not used heavily and lead to confusion. The new API is much more in-line with UITabBarController
