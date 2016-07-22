@@ -19,7 +19,8 @@ class ContainerViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        scrollTab.delegate = self
+        
         buildViewControllers()
         scrollTab.willMoveToParentViewController(self)
         addChildViewController(scrollTab)
@@ -63,5 +64,11 @@ class ContainerViewController: UIViewController {
             
             viewControllers.append(viewController)
         }
+    }
+}
+
+extension ContainerViewController: ScrollingTabControllerDelegate {
+    func scrollingTabController(tabController: ScrollingTabController, displayedViewControllerAtIndex index: Int) {
+        print("Index \(index) displayed")
     }
 }

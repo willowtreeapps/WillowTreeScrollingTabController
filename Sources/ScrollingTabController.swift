@@ -24,6 +24,10 @@
 
 import UIKit
 
+public protocol ScrollingTabControllerDelegate: class {
+    func scrollingTabController(tabController: ScrollingTabController, displayedViewControllerAtIndex: Int)
+}
+
 /*
  * Provides a common container view that has a collection view of tabs at the top, with a
  * container collection view at the bottom.
@@ -76,6 +80,8 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
 
         return self.tabControllersView.contentOffset.x / tabControllersView.contentSize.width
     }
+    
+    public weak var delegate: ScrollingTabControllerDelegate? = nil
     
     var viewControllerCache = NSCache()
     var tabControllersView: UIScrollView!
@@ -141,6 +147,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     override public func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         childEndAppearanceTransition(currentPage)
+        delegate?.scrollingTabController(self, displayedViewControllerAtIndex: currentPage)
         tabView.panToPercentage(scrolledPercentage)
     }
 
@@ -377,6 +384,8 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
             // Tell the new current page that it will appear
             childBeginAppearanceTransition(currentPage, isAppearing: true, animated: true)
             childEndAppearanceTransition(currentPage)
+            
+            delegate?.scrollingTabController(self, displayedViewControllerAtIndex: currentPage)
         }
     }
 
@@ -451,6 +460,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
         jumpScroll = true
         currentPage = index
         tabControllersView.setContentOffset(rect.origin, animated: true)
+        delegate?.scrollingTabController(self, displayedViewControllerAtIndex: index)
     }
     
     deinit {
