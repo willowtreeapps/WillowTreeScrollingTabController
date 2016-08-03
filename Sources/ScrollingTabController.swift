@@ -87,11 +87,13 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     var tabControllersView: UIScrollView!
     var jumpScroll = false
     
-    var currentPage: Int = 0
+    public internal(set) var currentPage: Int = 0
     var previousPage: Int = 0
     var updatingCurrentPage = true
     var loadedPages = HalfOpenInterval<Int>(0, 0)
     var numToPreload = 1
+    private var deferredInitialSelectedPage: Int?
+    private var initialAppearanceComplete = false
     
     var tabControllersViewRightConstraint: NSLayoutConstraint?
     
@@ -147,8 +149,16 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     override public func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         childEndAppearanceTransition(currentPage)
+
+        if let selectedPage = deferredInitialSelectedPage where !initialAppearanceComplete {
+            initialAppearanceComplete = true
+            selectTab(atIndex: selectedPage, animated: false)
+            deferredInitialSelectedPage = nil
+        } else {
+            tabView.panToPercentage(scrolledPercentage)
+        }
         delegate?.scrollingTabController(self, displayedViewControllerAtIndex: currentPage)
-        tabView.panToPercentage(scrolledPercentage)
+        initialAppearanceComplete = true
     }
 
     override public func viewWillDisappear(animated: Bool) {
@@ -317,6 +327,7 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
             ScrollingTabController.sizingCell.layoutIfNeeded()
             
             let size = ScrollingTabController.sizingCell.contentView.systemLayoutSizeFittingSize(UILayoutFittingCompressedSize)
+
             return CGSizeMake(size.width, tabView.frame.height)
         }
 
@@ -333,14 +344,27 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     }
     
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        // Tell the current view it is disappearing, scroll to the new page and tell that view 
+        selectTab(atIndex: indexPath.item, animated: true)
+    }
+
+    public func selectTab(atIndex index: Int, animated: Bool = true) {
+        guard 0..<viewControllers.count ~= index else {
+            return
+        }
+
+        if !isViewLoaded() || !initialAppearanceComplete {
+            deferredInitialSelectedPage = index
+            return
+        }
+
+        // Tell the current view it is disappearing, scroll to the new page and tell that view
         // that it did appear
-        childBeginAppearanceTransition(currentPage, isAppearing: false, animated: true)
+        childBeginAppearanceTransition(currentPage, isAppearing: false, animated: animated)
         previousPage = currentPage
 
-        lazyLoad(indexPath.item)
-        childBeginAppearanceTransition(indexPath.item, isAppearing: true, animated: true)
-        scrollToPage(indexPath.item, animate: true)
+        lazyLoad(index)
+        childBeginAppearanceTransition(index, isAppearing: true, animated: animated)
+        scrollToTab(atIndex: index, animated: animated)
     }
 
     override public func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
@@ -454,12 +478,15 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
             unloadTab(index)
         }
     }
-    
-    func scrollToPage(index: Int, animate: Bool) {
+
+    // Internally scroll to a tab at a given index. This only handles the scroll and not management 
+    // of the child view appearance
+    func scrollToTab(atIndex index: Int, animated: Bool = true) {
         let rect = CGRectMake(CGFloat(index) * tabControllersView.bounds.width, 0, tabControllersView.bounds.width, tabControllersView.bounds.height)
         jumpScroll = true
         currentPage = index
-        tabControllersView.setContentOffset(rect.origin, animated: true)
+
+        tabControllersView.setContentOffset(rect.origin, animated: animated)
         delegate?.scrollingTabController(self, displayedViewControllerAtIndex: index)
     }
     
