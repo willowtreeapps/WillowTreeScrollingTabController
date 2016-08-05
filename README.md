@@ -46,6 +46,10 @@ In addition, even more customization of the tab bar itself can be had by accessi
 
 ## Changes
 
+### 0.0.6
+
+* Add support for programatically channging the selected tab. You can now call 
+
 ### 0.0.5
 
 * Fix crash when the bounds of the tab controller were 0.
