@@ -35,6 +35,26 @@ class ViewController: ScrollingTabController {
         self.buildViewControllers()
         self.tabSizing = .sizeToContent
         self.tabView.centerSelectTabs = true
+
+        let nextBarButtonItem = UIBarButtonItem(barButtonSystemItem: .FastForward, target: self, action: #selector(jumpAhead))
+        let previousBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Rewind, target: self, action: #selector(jumpBack))
+        navigationItem.rightBarButtonItems = [nextBarButtonItem, previousBarButtonItem]
+    }
+
+    func jumpAhead() {
+        var page = currentPage + 1
+        if page == viewControllers.count {
+            page = 0
+        }
+        selectTab(atIndex: page)
+    }
+
+    func jumpBack() {
+        var page = currentPage - 1
+        if page < 0 {
+            page = viewControllers.count - 1
+        }
+        selectTab(atIndex: page)
     }
     
     func buildViewControllers() {
@@ -89,7 +109,7 @@ class TestingViewController: UIViewController {
         
         NSLayoutConstraint.activateConstraints([horizontal, vertical])
     }
-    
+
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         print("Will appear \(itemTextLabel.text)")

@@ -28,6 +28,7 @@ class ContainerViewController: UIViewController {
         scrollTab.view.translatesAutoresizingMaskIntoConstraints = false
         
         scrollContainer.addSubview(scrollTab.view)
+        scrollContainer.layoutIfNeeded()
     
         let horizontal = NSLayoutConstraint.constraintsWithVisualFormat("|[view]|", options: [], metrics: nil, views: ["view": scrollTab.view])
         let vertical = NSLayoutConstraint.constraintsWithVisualFormat("V:|[view]|", options: [], metrics: nil, views: ["view": scrollTab.view])
@@ -36,9 +37,10 @@ class ContainerViewController: UIViewController {
         scrollTab.didMoveToParentViewController(self)
         
         scrollTab.tabView.tabSizing = .fitViewFrameWidth
+        scrollTab.selectTab(atIndex: 1, animated: false)
         // Do any additional setup after loading the view.
     }
-    
+
     func buildViewControllers() {
         for i in 1...3 {
             let viewController = TestingViewController()

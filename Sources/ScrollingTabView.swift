@@ -251,6 +251,11 @@ public class ScrollingTabView: UIView {
     }
     
     func calculateItemSizeToFitWidth(width: CGFloat) {
+        // If the superview has not fully been laid out then skip calculation at this point.
+        guard width > 0 else {
+            return
+        }
+
         let numberOfItems = collectionView.numberOfItemsInSection(0)
 
         if numberOfItems > 0 {
