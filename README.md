@@ -46,6 +46,13 @@ In addition, even more customization of the tab bar itself can be had by accessi
 
 ## Changes
 
+### 0.0.7
+
+When the view controller specified an initial tab before it was
+displayed, that tab was not set before the appearance happened. This
+changes the order so that the tab is selected in viewWillAppear to fix
+the issue.
+
 ### 0.0.6
 
 * Add support for programatically channging the selected tab. You can now call 
