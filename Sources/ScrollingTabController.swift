@@ -143,21 +143,25 @@ public class ScrollingTabController: UIViewController, UIScrollViewDelegate, UIC
     override public func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
 
-        childBeginAppearanceTransition(currentPage, isAppearing: true, animated: animated)
-    }
-
-    override public func viewDidAppear(animated: Bool) {
-        super.viewDidAppear(animated)
-        childEndAppearanceTransition(currentPage)
-
         if let selectedPage = deferredInitialSelectedPage where !initialAppearanceComplete {
             initialAppearanceComplete = true
             selectTab(atIndex: selectedPage, animated: false)
             deferredInitialSelectedPage = nil
         } else {
+            childBeginAppearanceTransition(currentPage, isAppearing: true, animated: animated)
             tabView.panToPercentage(scrolledPercentage)
         }
+
         delegate?.scrollingTabController(self, displayedViewControllerAtIndex: currentPage)
+    }
+
+    override public func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+
+        if initialAppearanceComplete {
+            childEndAppearanceTransition(currentPage)
+        }
+
         initialAppearanceComplete = true
     }
 
