@@ -46,6 +46,10 @@ In addition, even more customization of the tab bar itself can be had by accessi
 
 ## Changes
 
+### 0.1.0
+
+Update to Swift 3.
+
 ### 0.0.7
 
 When the view controller specified an initial tab before it was
