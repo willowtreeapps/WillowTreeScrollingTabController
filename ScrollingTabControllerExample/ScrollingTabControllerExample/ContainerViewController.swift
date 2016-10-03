@@ -22,7 +22,7 @@ class ContainerViewController: UIViewController {
         scrollTab.delegate = self
         
         buildViewControllers()
-        scrollTab.willMoveToParentViewController(self)
+        scrollTab.willMove(toParentViewController: self)
         addChildViewController(scrollTab)
         scrollTab.viewControllers = viewControllers
         scrollTab.view.translatesAutoresizingMaskIntoConstraints = false
@@ -30,11 +30,11 @@ class ContainerViewController: UIViewController {
         scrollContainer.addSubview(scrollTab.view)
         scrollContainer.layoutIfNeeded()
     
-        let horizontal = NSLayoutConstraint.constraintsWithVisualFormat("|[view]|", options: [], metrics: nil, views: ["view": scrollTab.view])
-        let vertical = NSLayoutConstraint.constraintsWithVisualFormat("V:|[view]|", options: [], metrics: nil, views: ["view": scrollTab.view])
-        NSLayoutConstraint.activateConstraints(horizontal + vertical)
+        let horizontal = NSLayoutConstraint.constraints(withVisualFormat: "|[view]|", options: [], metrics: nil, views: ["view": scrollTab.view])
+        let vertical = NSLayoutConstraint.constraints(withVisualFormat: "V:|[view]|", options: [], metrics: nil, views: ["view": scrollTab.view])
+        NSLayoutConstraint.activate(horizontal + vertical)
         
-        scrollTab.didMoveToParentViewController(self)
+        scrollTab.didMove(toParentViewController: self)
         
         scrollTab.tabView.tabSizing = .fitViewFrameWidth
         scrollTab.selectTab(atIndex: 1, animated: false)
@@ -45,20 +45,20 @@ class ContainerViewController: UIViewController {
         for i in 1...3 {
             let viewController = TestingViewController()
             
-            var color = UIColor.whiteColor()
+            var color = UIColor.white
             switch i % 5 {
             case 0:
-                color = UIColor.redColor()
+                color = UIColor.red
             case 1:
-                color = UIColor.blueColor()
+                color = UIColor.blue
             case 2:
-                color = UIColor.greenColor()
+                color = UIColor.green
             case 3:
-                color = UIColor.orangeColor()
+                color = UIColor.orange
             case 4:
-                color = UIColor.purpleColor()
+                color = UIColor.purple
             default:
-                color = UIColor.whiteColor()
+                color = UIColor.white
             }
             viewController.view.backgroundColor = color
             viewController.itemTextLabel.text = "\(i)"
@@ -70,7 +70,7 @@ class ContainerViewController: UIViewController {
 }
 
 extension ContainerViewController: ScrollingTabControllerDelegate {
-    func scrollingTabController(tabController: ScrollingTabController, displayedViewControllerAtIndex index: Int) {
+    func scrollingTabController(_ tabController: ScrollingTabController, displayedViewControllerAtIndex index: Int) {
         print("Index \(index) displayed")
     }
 }

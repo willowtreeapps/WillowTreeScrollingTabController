@@ -36,8 +36,8 @@ class ViewController: ScrollingTabController {
         self.tabSizing = .sizeToContent
         self.tabView.centerSelectTabs = true
 
-        let nextBarButtonItem = UIBarButtonItem(barButtonSystemItem: .FastForward, target: self, action: #selector(jumpAhead))
-        let previousBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Rewind, target: self, action: #selector(jumpBack))
+        let nextBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(jumpAhead))
+        let previousBarButtonItem = UIBarButtonItem(barButtonSystemItem: .rewind, target: self, action: #selector(jumpBack))
         navigationItem.rightBarButtonItems = [nextBarButtonItem, previousBarButtonItem]
     }
 
@@ -64,22 +64,22 @@ class ViewController: ScrollingTabController {
             viewController.tabBarItem.title = "VC \(i)"
             viewController.itemTextLabel.text = "\(i)"
             
-            var color = UIColor.whiteColor()
+            var color = UIColor.white
             switch i % 5 {
             case 0:
-                color = UIColor.redColor()
+                color = UIColor.red
             case 1:
-                color = UIColor.blueColor()
+                color = UIColor.blue
                 viewController.tabBarItem.title = "REALLY LONG VC NAME \(i)"
             case 2:
-                color = UIColor.greenColor()
+                color = UIColor.green
             case 3:
-                color = UIColor.orangeColor()
+                color = UIColor.orange
             case 4:
-                color = UIColor.purpleColor()
+                color = UIColor.purple
                 viewController.tabBarItem.title = "LONG VC NAME \(i)"
             default:
-                color = UIColor.whiteColor()
+                color = UIColor.white
             }
             viewController.backgroundColor = color
             
@@ -91,8 +91,8 @@ class ViewController: ScrollingTabController {
 
 class TestingViewController: UIViewController {
     
-    var itemTextLabel = UILabel(frame: CGRectZero)
-    var backgroundColor: UIColor = UIColor.purpleColor()
+    var itemTextLabel = UILabel(frame: CGRect.zero)
+    var backgroundColor: UIColor = UIColor.purple
 
     override func viewDidLoad() {
         view.backgroundColor = backgroundColor
@@ -101,32 +101,32 @@ class TestingViewController: UIViewController {
         print("Did Load \(itemTextLabel.text)")
         
         self.itemTextLabel.backgroundColor = UIColor(white: 1.0, alpha: 0.7)
-        self.itemTextLabel.textColor = UIColor.blackColor()
-        self.itemTextLabel.font = UIFont.systemFontOfSize(100)
+        self.itemTextLabel.textColor = UIColor.black
+        self.itemTextLabel.font = UIFont.systemFont(ofSize: 100)
         self.itemTextLabel.translatesAutoresizingMaskIntoConstraints = false
-        let horizontal = NSLayoutConstraint(item: itemTextLabel, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1.0, constant: 0.0)
-        let vertical = NSLayoutConstraint(item: itemTextLabel, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1.0, constant: 0.0)
+        let horizontal = NSLayoutConstraint(item: itemTextLabel, attribute: .centerX, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1.0, constant: 0.0)
+        let vertical = NSLayoutConstraint(item: itemTextLabel, attribute: .centerY, relatedBy: .equal, toItem: self.view, attribute: .centerY, multiplier: 1.0, constant: 0.0)
         
-        NSLayoutConstraint.activateConstraints([horizontal, vertical])
+        NSLayoutConstraint.activate([horizontal, vertical])
     }
 
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         print("Will appear \(itemTextLabel.text)")
         usleep(1000)
     }
 
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         print("Did appear \(itemTextLabel.text)")
     }
 
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         print("Will disappear \(itemTextLabel.text)")
     }
 
-    override func viewDidDisappear(animated: Bool) {
+    override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         print("Did disappear \(itemTextLabel.text)")
     }

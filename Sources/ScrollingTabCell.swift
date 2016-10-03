@@ -28,33 +28,33 @@ import UIKit
 /**
  * Default tab cell implementation for the tab controller
  */
-public class ScrollingTabCell: UICollectionViewCell {
+open class ScrollingTabCell: UICollectionViewCell {
     
     /// Title label shown in the cell.
-    public var titleLabel: UILabel!
+    open var titleLabel: UILabel!
     
-    public var title: String? {
+    open var title: String? {
         didSet {
             titleLabel.text = title
         }
     }
     
-    public override var selected: Bool {
+    open override var isSelected: Bool {
         didSet {
-            if selected {
+            if isSelected {
                 titleLabel.textColor = tintColor
             } else {
-                titleLabel.textColor = UIColor.darkTextColor()
+                titleLabel.textColor = UIColor.darkText
             }
         }
     }
     
-    public override var highlighted: Bool {
+    open override var isHighlighted: Bool {
         didSet {
-            if highlighted {
+            if isHighlighted {
                 titleLabel.textColor = tintColor
             } else {
-                titleLabel.textColor = UIColor.darkTextColor()
+                titleLabel.textColor = UIColor.darkText
             }
         }
     }
@@ -71,23 +71,23 @@ public class ScrollingTabCell: UICollectionViewCell {
     
     func setup() {
         
-        backgroundColor = UIColor.clearColor()
+        backgroundColor = UIColor.clear
         
         titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.textAlignment = .Center
+        titleLabel.textAlignment = .center
         contentView.addSubview(titleLabel)
         
-        let horizontalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("|-[view]-|",
+        let horizontalConstraints = NSLayoutConstraint.constraints(withVisualFormat: "|-[view]-|",
             options: NSLayoutFormatOptions(rawValue:0),
             metrics: nil,
             views: ["view": titleLabel])
-        let verticalConstraints = NSLayoutConstraint.constraintsWithVisualFormat("V:|-[view]-|",
+        let verticalConstraints = NSLayoutConstraint.constraints(withVisualFormat: "V:|-[view]-|",
             options: NSLayoutFormatOptions(rawValue:0),
             metrics: nil,
             views: ["view": titleLabel])
-        titleLabel.setContentHuggingPriority(UILayoutPriorityRequired, forAxis: .Horizontal)
+        titleLabel.setContentHuggingPriority(UILayoutPriorityRequired, for: .horizontal)
 
-        NSLayoutConstraint.activateConstraints(horizontalConstraints + verticalConstraints)
+        NSLayoutConstraint.activate(horizontalConstraints + verticalConstraints)
     }
 }
