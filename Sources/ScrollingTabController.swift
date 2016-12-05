@@ -51,13 +51,7 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
     
     /// Array of the view controllers that are contained in the bottom view controller. Please note
     /// that if the data source is set, this array is no longer used.
-    open var viewControllers = [UIViewController]() {
-        didSet {
-            if tabControllersView != nil {
-                configureViewControllers()
-            }
-        }
-    }
+    var viewControllers = [UIViewController]()
 
     public var tabTheme: CellTheme = CellTheme(font: UIFont.systemFont(ofSize: UIFont.systemFontSize),
                                                defaultColor: .darkText, selectedColor: .blue)
@@ -202,17 +196,31 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
     }
 
     func configureViewControllers() {
-        for item in items {
-            let child = item.controller
-            child.willMove(toParentViewController: nil)
-            child.view.removeFromSuperview()
-            child.removeFromParentViewController()
-            item.container.removeFromSuperview()
-        }
-        
         for viewController in viewControllers {
             items.append(TabItem(addTabContainer(), viewController))
         }
+    }
+
+    public func injectInitialViewControllers(_ viewControllers: [UIViewController]) {
+        guard tabControllersView != nil else { return }
+        self.viewControllers = viewControllers
+        configureViewControllers()
+    }
+
+    public func appendViewController(_ newViewControllers: [UIViewController]) {
+        var inserts: [IndexPath] = []
+        for index in 0..<newViewControllers.count {
+            inserts.append(IndexPath(item: index + viewControllers.count, section: 0))
+        }
+        for vc in newViewControllers {
+            items.append(TabItem(addTabContainer(), vc))
+        }
+        viewControllers += newViewControllers
+        tabView.collectionView.performBatchUpdates({
+            self.tabView.collectionView.insertItems(at: inserts)
+        }, completion: { _ in
+            self.tabView.panToPercentage(self.scrolledPercentage)
+        })
     }
     
     func addTabContainer() -> UIView {
