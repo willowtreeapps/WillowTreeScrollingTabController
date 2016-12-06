@@ -35,7 +35,7 @@ public protocol ScrollingTabControllerDelegate: class {
 open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
 
     public struct CellTheme {
-        public let font: UIFont
+        public var font: UIFont
         public let defaultColor: UIColor
         public let selectedColor: UIColor
 
@@ -54,7 +54,11 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
     var viewControllers = [UIViewController]()
 
     public var tabTheme: CellTheme = CellTheme(font: UIFont.systemFont(ofSize: UIFont.systemFontSize),
-                                               defaultColor: .darkText, selectedColor: .blue)
+                                               defaultColor: .darkText, selectedColor: .blue) {
+        didSet {
+            ScrollingTabController.sizingCell.theme = tabTheme
+        }
+    }
     
     /// Specifies if the tab view should size the width of the tabs to their content.
     open var tabSizing: ScrollingTabView.TabSizing = .fitViewFrameWidth {
@@ -202,8 +206,8 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
     }
 
     public func injectInitialViewControllers(_ viewControllers: [UIViewController]) {
-        guard tabControllersView != nil else { return }
         self.viewControllers = viewControllers
+        guard tabControllersView != nil else { return }
         configureViewControllers()
     }
 
@@ -342,19 +346,16 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
 
         switch tabSizing {
         case .fitViewFrameWidth, .fixedSize(_):
-            if let flowLayout = collectionViewLayout as? UICollectionViewFlowLayout {
-                return flowLayout.itemSize
+            guard let flowLayout = collectionViewLayout as? UICollectionViewFlowLayout else {
+                break
             }
+            return flowLayout.itemSize
         case .sizeToContent:
-
             ScrollingTabController.sizingCell.frame.size = CGSize(width: 9999.0, height: tabView.frame.height)
             ScrollingTabController.sizingCell.contentView.frame = ScrollingTabController.sizingCell.bounds
-            
-            ScrollingTabController.sizingCell.title = viewControllers[(indexPath as NSIndexPath).row].tabBarItem.title
+            ScrollingTabController.sizingCell.title = viewControllers[indexPath.item].tabBarItem.title
             ScrollingTabController.sizingCell.layoutIfNeeded()
-            
             let size = ScrollingTabController.sizingCell.contentView.systemLayoutSizeFitting(UILayoutFittingCompressedSize)
-
             return CGSize(width: size.width, height: tabView.frame.height)
         }
 

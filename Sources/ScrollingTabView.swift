@@ -180,10 +180,12 @@ open class ScrollingTabView: UIView {
     }
     
     open func panToPercentage(_ percentage: CGFloat) {
+        let tabCount = collectionView.numberOfItems(inSection: 0)
+        guard tabCount > 0 else {
+            return
+        }
 
         lastPercentage = percentage
-
-        let tabCount = collectionView.numberOfItems(inSection: 0)
         let percentageInterval = CGFloat(1.0 / Double(tabCount))
         
         let firstItem = floorf(Float(percentage / percentageInterval))
