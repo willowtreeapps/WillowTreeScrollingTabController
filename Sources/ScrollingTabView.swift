@@ -247,7 +247,11 @@ open class ScrollingTabView: UIView {
                 
                 if (x < collectionView.contentSize.width - (frame.width / 2.0) - (width / 2.0)) {
                     collectionView.contentOffset = CGPoint(x: x - (frame.width / 2 - width / 2.0), y: 0)
+                } else {
+                    collectionView.contentOffset.x = collectionView.contentSize.width - frame.width
                 }
+            } else {
+                collectionView.contentOffset.x = 0
             }
         }
     }
