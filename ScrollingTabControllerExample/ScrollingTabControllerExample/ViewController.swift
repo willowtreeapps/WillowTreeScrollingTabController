@@ -43,7 +43,7 @@ class ViewController: ScrollingTabController {
 
     func jumpAhead() {
         var page = currentPage + 1
-        if page == viewControllers.count {
+        if page == viewControllerCount {
             page = 0
         }
         selectTab(atIndex: page)
@@ -52,12 +52,13 @@ class ViewController: ScrollingTabController {
     func jumpBack() {
         var page = currentPage - 1
         if page < 0 {
-            page = viewControllers.count - 1
+            page = viewControllerCount - 1
         }
         selectTab(atIndex: page)
     }
     
     func buildViewControllers() {
+        var newViewControllers: [UIViewController] = []
         for i in 1...10 {
             let viewController = TestingViewController()
             
@@ -82,10 +83,9 @@ class ViewController: ScrollingTabController {
                 color = UIColor.white
             }
             viewController.backgroundColor = color
-            
-            
-            self.viewControllers.append(viewController)
+            newViewControllers.append(viewController)
         }
+        injectInitialViewControllers(newViewControllers)
     }
 }
 

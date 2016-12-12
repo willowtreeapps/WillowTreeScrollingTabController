@@ -53,6 +53,10 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
     /// that if the data source is set, this array is no longer used.
     var viewControllers = [UIViewController]()
 
+    public var viewControllerCount: Int {
+        return viewControllers.count
+    }
+
     public var tabTheme: CellTheme = CellTheme(font: UIFont.systemFont(ofSize: UIFont.systemFontSize),
                                                defaultColor: .darkText, selectedColor: .blue)
     
@@ -202,8 +206,18 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
     }
 
     public func injectInitialViewControllers(_ viewControllers: [UIViewController]) {
-        guard tabControllersView != nil else { return }
         self.viewControllers = viewControllers
+        guard tabControllersView != nil else { return }
+
+        for item in items {
+            let child = item.controller
+            child.willMove(toParentViewController: nil)
+            child.view.removeFromSuperview()
+            child.removeFromParentViewController()
+            item.container.removeFromSuperview()
+        }
+        items = []
+
         configureViewControllers()
     }
 
@@ -216,9 +230,30 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
             items.append(TabItem(addTabContainer(), vc))
         }
         viewControllers += newViewControllers
+        updateTabView(inserts: inserts, deletes: [])
+    }
+
+    public func removeViewControllers(indices: [Int]) {
+        var deletes: [IndexPath] = []
+        let orginalCount = viewControllers.count
+        for index in indices {
+            guard index < orginalCount else {
+                continue
+            }
+            deletes.append(IndexPath(item: index, section: 0))
+            viewControllers.remove(at: index)
+        }
+        updateTabView(inserts: [], deletes: deletes)
+    }
+
+    private func updateTabView(inserts: [IndexPath], deletes: [IndexPath]) {
         tabView.collectionView.performBatchUpdates({
             self.tabView.collectionView.insertItems(at: inserts)
+            self.tabView.collectionView.deleteItems(at: deletes)
         }, completion: { _ in
+            if case .fitViewFrameWidth = self.tabSizing {
+                self.tabView.collectionView.collectionViewLayout.invalidateLayout()
+            }
             self.tabView.panToPercentage(self.scrolledPercentage)
         })
     }
