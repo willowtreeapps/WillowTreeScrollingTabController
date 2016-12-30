@@ -36,6 +36,8 @@ open class ScrollingTabView: UIView {
         case fitViewFrameWidth
         case fixedSize(CGFloat)
         case sizeToContent
+        ///Takes on the attributes of fitViewFrameWidth until the content is too large and then it takes on the attributes of sizeToContent
+        case flexibleWidth
     }
 
     /// Collection view containing the tabs
@@ -71,18 +73,30 @@ open class ScrollingTabView: UIView {
     /// Specifies if the tabs should size to fit their content
     open var tabSizing: TabSizing = .fitViewFrameWidth {
         didSet {
+            
+            let layout = collectionView.collectionViewLayout as? ScrollingTabViewFlowLayout
+            
             switch tabSizing {
             case .fitViewFrameWidth:
                 calculateItemSizeToFitWidth(frame.width)
+                layout?.flexibleWidth = false
+                
             case .fixedSize(let width):
-                if let layout = collectionView.collectionViewLayout as? ScrollingTabViewFlowLayout {
+                if let layout = layout {
                     layout.itemSize = CGSize(width: width, height: layout.itemSize.height)
-                    layout.invalidateLayout()
+                    layout.flexibleWidth = false
                 }
-            default:
-                // Delegate will handle sizing per cell.
+                
+            case .flexibleWidth:
+                layout?.flexibleWidth = true
+                
+            // Delegate will handle sizing per cell.
+            default :
+                layout?.flexibleWidth = false
                 break
             }
+            
+            layout?.invalidateLayout()
         }
     }
     
@@ -127,6 +141,12 @@ open class ScrollingTabView: UIView {
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         setup()
+    }
+    
+    override open var bounds: CGRect {
+        didSet {
+            collectionView.collectionViewLayout.invalidateLayout()
+        }
     }
     
     func setup() {
@@ -179,6 +199,10 @@ open class ScrollingTabView: UIView {
         }
     }
     
+    func setStartingIndicatorWidth(width: CGFloat) {
+        selectionIndicatorWidthConstraint.constant = width
+    }
+    
     open func panToPercentage(_ percentage: CGFloat) {
 
         lastPercentage = percentage
@@ -186,11 +210,11 @@ open class ScrollingTabView: UIView {
         let tabCount = collectionView.numberOfItems(inSection: 0)
         let percentageInterval = CGFloat(1.0 / Double(tabCount))
         
-        let firstItem = floorf(Float(percentage / percentageInterval))
+        let firstItem = floorf(Float(percentage * CGFloat(tabCount)))
         let secondItem = firstItem + 1
 
-        var firstPath: IndexPath?
-        var secondPath: IndexPath?
+        var firstPath: IndexPath
+        var secondPath: IndexPath
         
         if (firstItem < 0)
         {
@@ -222,53 +246,49 @@ open class ScrollingTabView: UIView {
         let selectIndexPath = percentFirst >= 0.5 ? firstPath : secondPath
         collectionView.selectItem(at: selectIndexPath, animated: false, scrollPosition: UICollectionViewScrollPosition())
 
-        let attrs1 = collectionView.collectionViewLayout.layoutAttributesForItem(at: firstPath!)
-        let attrs2 = collectionView.collectionViewLayout.layoutAttributesForItem(at: secondPath!)
+        let attrs1 = collectionView.collectionViewLayout.layoutAttributesForItem(at: firstPath)
+        let attrs2 = collectionView.collectionViewLayout.layoutAttributesForItem(at: secondPath)
         
-        let firstFrame = attrs1?.frame
-        let secondFrame = attrs2?.frame
+        let firstFrame = attrs1!.frame
+        let secondFrame = attrs2!.frame
         
-        var x = firstFrame!.width * percentSecond + firstFrame!.minX
+        var x = firstFrame.width * percentSecond + firstFrame.minX
         if firstItem < 0 {
-            x -= firstFrame!.width
+            x -= firstFrame.width
         }
 
-        let width = firstFrame!.width * percentFirst + secondFrame!.width * percentSecond
+        let width = firstFrame.width * percentFirst + secondFrame.width * percentSecond
         
         selectionIndicatorLeadingConstraint.constant = x + selectionIndicatorEdgeInsets.left
         selectionIndicatorWidthConstraint.constant = width - selectionIndicatorEdgeInsets.left - selectionIndicatorEdgeInsets.right
         
+        let centerSelectOffset = x - (frame.width / 2 - width / 2.0)
         if centerSelectTabs {
-            collectionView.contentOffset = CGPoint(x: x - (frame.width / 2 - width / 2.0), y: 0)
-        } else {
-            if x > (frame.width / 2.0) - (width / 2.0) {
-                
-                if (x < collectionView.contentSize.width - (frame.width / 2.0) - (width / 2.0)) {
-                    collectionView.contentOffset = CGPoint(x: x - (frame.width / 2 - width / 2.0), y: 0)
-                }
+            collectionView.contentOffset = CGPoint(x: centerSelectOffset, y: 0)
+        } else if collectionView.contentSize.width > frame.width {
+            let collectionViewWidth = collectionView.contentSize.width
+            let halfFrame = (frame.width / 2.0)
+            let maxOffset = collectionViewWidth - frame.width
+            if x < halfFrame {
+                collectionView.contentOffset = CGPoint(x: 0, y: 0)
+            } else if x < maxOffset {
+                collectionView.contentOffset = CGPoint(x: centerSelectOffset, y: 0)
+            } else {
+                collectionView.contentOffset = CGPoint(x: maxOffset, y: 0)
             }
         }
     }
     
     func calculateItemSizeToFitWidth(_ width: CGFloat) {
-        // If the superview has not fully been laid out then skip calculation at this point.
-        guard width > 0 else {
-            return
-        }
-
-        let numberOfItems = collectionView.numberOfItems(inSection: 0)
-
-        if numberOfItems > 0 {
-            if let layout = collectionView.collectionViewLayout as? ScrollingTabViewFlowLayout {
-                let calculatedSize = CGSize(width: width / CGFloat(numberOfItems), height: layout.itemSize.height)
-
-                if layout.itemSize != calculatedSize {
-                    layout.itemSize = calculatedSize
+        let numberOfItems = collectionView.numberOfItems(inSection:0)
+        if numberOfItems > 0, let layout = collectionView.collectionViewLayout as? ScrollingTabViewFlowLayout {
+            let calculatedSize = CGSize(width: (width / CGFloat(numberOfItems)),height: layout.itemSize.height)
+            if layout.itemSize != calculatedSize {
+                layout.itemSize = calculatedSize
                     layout.invalidateLayout()
                     collectionView.layoutIfNeeded()
                 }
-                panToPercentage(lastPercentage)
-            }
+            panToPercentage(lastPercentage)
         }
     }
 }
@@ -293,6 +313,12 @@ open class ScrollingTabViewFlowLayout: UICollectionViewFlowLayout {
     /// Specifies if the divider is visible. Defaults to false.
     open var showDivider: Bool = false
     
+    var flexibleWidth : Bool = false {
+        didSet {
+            self.invalidateLayout()
+        }
+    }
+    
     override init() {
         super.init()
         setup()
@@ -307,7 +333,6 @@ open class ScrollingTabViewFlowLayout: UICollectionViewFlowLayout {
         sectionInset = UIEdgeInsets.zero
         minimumInteritemSpacing = 0
         minimumLineSpacing = 0
-        itemSize = CGSize(width: 100, height: 30.0)
         scrollDirection = .horizontal
     }
     
@@ -332,15 +357,12 @@ open class ScrollingTabViewFlowLayout: UICollectionViewFlowLayout {
             return nil
         }
         
-        var updatedAttributes = attributes
+        var updatedAttributes = attributes.map { $0.copy() as! UICollectionViewLayoutAttributes }
         
         if showDivider {
-            for layoutAttribute in attributes {
-                if (layoutAttribute.representedElementCategory == .cell) {
-                    if let dividerAttribute = layoutAttributesForDecorationView(ofKind: ScrollingTabVerticalDividerType,
-                        at: layoutAttribute.indexPath) {
-                            updatedAttributes.append(dividerAttribute)
-                    }
+            for layoutAttribute in attributes where layoutAttribute.representedElementCategory == .cell {
+                if let dividerAttribute = layoutAttributesForDecorationView(ofKind: ScrollingTabVerticalDividerType, at: layoutAttribute.indexPath) {
+                    updatedAttributes.append(dividerAttribute)
                 }
             }
         }
