@@ -27,7 +27,7 @@
 import UIKit
 import ScrollingTabController
 
-class ViewController: ScrollingTabController {
+class PrimaryViewController: ScrollingTabController {
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)

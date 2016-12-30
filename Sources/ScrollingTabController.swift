@@ -58,6 +58,7 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
     open var centerSelectTabs: Bool = false {
         didSet {
             tabView.centerSelectTabs = centerSelectTabs
+            reloadCurrentPage(animated: true)
         }
     }
 
@@ -149,21 +150,7 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
             selectTab(atIndex: selectedPage, animated: false)
             deferredInitialSelectedPage = nil
         } else {
-            childBeginAppearanceTransition(currentPage, isAppearing: true, animated: animated)
-            
-            let animationBlock = {
-                self.tabView.collectionView.collectionViewLayout.invalidateLayout()
-                self.tabView.panToPercentage(self.scrolledPercentage)
-            }
-            
-            guard let transitionCoordinator = transitionCoordinator else {
-                animationBlock()
-                return;
-            }
-            
-            transitionCoordinator.animate(alongsideTransition: { context in
-                animationBlock()
-            }, completion: nil)
+            reloadCurrentPage(animated: animated)
         }
         
         delegate?.scrollingTabController(self, displayedViewControllerAtIndex: currentPage)
@@ -187,6 +174,24 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
     override open func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         childEndAppearanceTransition(currentPage)
+    }
+
+    open func reloadCurrentPage(animated: Bool) {
+        childBeginAppearanceTransition(currentPage, isAppearing: true, animated: animated)
+        
+        let animationBlock = {
+            self.tabView.collectionView.collectionViewLayout.invalidateLayout()
+            self.tabView.panToPercentage(self.scrolledPercentage)
+        }
+        
+        guard let transitionCoordinator = transitionCoordinator else {
+            animationBlock()
+            return;
+        }
+        
+        transitionCoordinator.animate(alongsideTransition: { context in
+            animationBlock()
+        }, completion: nil)
     }
 
     open override var shouldAutomaticallyForwardAppearanceMethods : Bool {

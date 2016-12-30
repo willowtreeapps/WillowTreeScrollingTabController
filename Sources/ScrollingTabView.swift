@@ -196,6 +196,8 @@ open class ScrollingTabView: UIView {
         if centerSelectTabs {
             let inset = collectionView.frame.width / 2.0 - scrollingLayout.itemSize.width / 2.0
             collectionView.contentInset = UIEdgeInsetsMake(0, inset, 0, inset)
+        } else {
+            collectionView.contentInset = UIEdgeInsets.zero
         }
     }
     
