@@ -33,6 +33,18 @@ public protocol ScrollingTabControllerDelegate: class {
  * container collection view at the bottom.
  */
 open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
+
+    public struct CellTheme {
+        public let font: UIFont
+        public let defaultColor: UIColor
+        public let selectedColor: UIColor
+
+        public init(font: UIFont, defaultColor: UIColor, selectedColor: UIColor) {
+            self.font = font
+            self.defaultColor = defaultColor
+            self.selectedColor = selectedColor
+        }
+    }
     
     /// The top ScrollingTabView
     open var tabView = ScrollingTabView()
@@ -46,6 +58,9 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
             }
         }
     }
+
+    public var tabTheme: CellTheme = CellTheme(font: UIFont.systemFont(ofSize: UIFont.systemFontSize),
+                                               defaultColor: .darkText, selectedColor: .blue)
     
     /// Specifies if the tab view should size the width of the tabs to their content.
     open var tabSizing: ScrollingTabView.TabSizing = .fitViewFrameWidth {
@@ -310,6 +325,7 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
         
         let viewController = viewControllers[(indexPath as NSIndexPath).item]
         cell.title = viewController.tabBarItem.title
+        cell.theme = tabTheme
 
         return cell
     }
