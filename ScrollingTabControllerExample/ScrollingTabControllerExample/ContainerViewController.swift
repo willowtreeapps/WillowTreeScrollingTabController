@@ -24,7 +24,7 @@ class ContainerViewController: UIViewController {
         buildViewControllers()
         scrollTab.willMove(toParentViewController: self)
         addChildViewController(scrollTab)
-        scrollTab.viewControllers = viewControllers
+        scrollTab.injectInitialViewControllers(viewControllers)
         scrollTab.view.translatesAutoresizingMaskIntoConstraints = false
         
         scrollContainer.addSubview(scrollTab.view)

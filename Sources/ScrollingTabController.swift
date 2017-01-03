@@ -51,12 +51,10 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
     
     /// Array of the view controllers that are contained in the bottom view controller. Please note
     /// that if the data source is set, this array is no longer used.
-    open var viewControllers = [UIViewController]() {
-        didSet {
-            if tabControllersView != nil {
-                configureViewControllers()
-            }
-        }
+    var viewControllers = [UIViewController]()
+
+    public var viewControllerCount: Int {
+        return viewControllers.count
     }
 
     public var tabTheme: CellTheme = CellTheme(font: UIFont.systemFont(ofSize: UIFont.systemFontSize),
@@ -202,6 +200,15 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
     }
 
     func configureViewControllers() {
+        for viewController in viewControllers {
+            items.append(TabItem(addTabContainer(), viewController))
+        }
+    }
+
+    public func injectInitialViewControllers(_ viewControllers: [UIViewController]) {
+        self.viewControllers = viewControllers
+        guard tabControllersView != nil else { return }
+
         for item in items {
             let child = item.controller
             child.willMove(toParentViewController: nil)
@@ -209,10 +216,56 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
             child.removeFromParentViewController()
             item.container.removeFromSuperview()
         }
-        
-        for viewController in viewControllers {
-            items.append(TabItem(addTabContainer(), viewController))
+        items = []
+
+        configureViewControllers()
+    }
+
+    public func appendViewController(_ newViewControllers: [UIViewController]) {
+        var inserts: [IndexPath] = []
+        for index in 0..<newViewControllers.count {
+            inserts.append(IndexPath(item: index + viewControllers.count, section: 0))
         }
+        for vc in newViewControllers {
+            addChildViewController(vc)
+            vc.willMove(toParentViewController: self)
+            items.append(TabItem(addTabContainer(), vc))
+        }
+        viewControllers += newViewControllers
+        updateTabView(inserts: inserts, deletes: [])
+    }
+
+    public func removeViewControllers(indices: [Int]) {
+        var deletes: [IndexPath] = []
+        let orginalCount = viewControllers.count
+        for index in indices {
+            guard index < orginalCount else {
+                continue
+            }
+            removeViewController(at: index)
+            deletes.append(IndexPath(item: index, section: 0))
+        }
+        updateTabView(inserts: [], deletes: deletes)
+    }
+
+    private func removeViewController(at index: Int) {
+        let viewController = viewControllers[index]
+        viewController.willMove(toParentViewController: nil)
+        viewController.view.removeFromSuperview()
+        viewController.removeFromParentViewController()
+        viewControllers.remove(at: index)
+    }
+
+    private func updateTabView(inserts: [IndexPath], deletes: [IndexPath]) {
+        tabView.collectionView.performBatchUpdates({
+            self.tabView.collectionView.insertItems(at: inserts)
+            self.tabView.collectionView.deleteItems(at: deletes)
+        }, completion: { _ in
+            if case .fitViewFrameWidth = self.tabSizing {
+                self.tabView.collectionView.collectionViewLayout.invalidateLayout()
+            }
+            self.tabView.panToPercentage(self.scrolledPercentage)
+        })
     }
     
     func addTabContainer() -> UIView {
