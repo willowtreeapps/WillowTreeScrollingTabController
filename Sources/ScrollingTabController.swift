@@ -227,6 +227,8 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
             inserts.append(IndexPath(item: index + viewControllers.count, section: 0))
         }
         for vc in newViewControllers {
+            addChildViewController(vc)
+            vc.willMove(toParentViewController: self)
             items.append(TabItem(addTabContainer(), vc))
         }
         viewControllers += newViewControllers
@@ -240,10 +242,18 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
             guard index < orginalCount else {
                 continue
             }
+            removeViewController(at: index)
             deletes.append(IndexPath(item: index, section: 0))
-            viewControllers.remove(at: index)
         }
         updateTabView(inserts: [], deletes: deletes)
+    }
+
+    private func removeViewController(at index: Int) {
+        let viewController = viewControllers[index]
+        viewController.willMove(toParentViewController: nil)
+        viewController.view.removeFromSuperview()
+        viewController.removeFromParentViewController()
+        viewControllers.remove(at: index)
     }
 
     private func updateTabView(inserts: [IndexPath], deletes: [IndexPath]) {
