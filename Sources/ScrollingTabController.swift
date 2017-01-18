@@ -73,6 +73,7 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
     open var centerSelectTabs: Bool = false {
         didSet {
             tabView.centerSelectTabs = centerSelectTabs
+            reloadCurrentPage(animated: true)
         }
     }
 
@@ -106,6 +107,7 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
     var updatingCurrentPage = true
     var loadedPages = (0 ..< 0)
     var numToPreload = 1
+    fileprivate var largestTabSize = CGSize.zero
     fileprivate var deferredInitialSelectedPage: Int?
     fileprivate var initialAppearanceComplete = false
     
@@ -150,22 +152,22 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
         tabView.collectionView.dataSource = self
         
         configureViewControllers()
+        setLargestTabSize()
         reloadData()
         loadTab(0)
     }
 
     override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
+        
         if let selectedPage = deferredInitialSelectedPage , !initialAppearanceComplete {
             initialAppearanceComplete = true
             selectTab(atIndex: selectedPage, animated: false)
             deferredInitialSelectedPage = nil
         } else {
-            childBeginAppearanceTransition(currentPage, isAppearing: true, animated: animated)
-            tabView.panToPercentage(scrolledPercentage)
+            reloadCurrentPage(animated: animated)
         }
-
+        
         delegate?.scrollingTabController(self, displayedViewControllerAtIndex: currentPage)
     }
 
@@ -189,6 +191,24 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
         childEndAppearanceTransition(currentPage)
     }
 
+    open func reloadCurrentPage(animated: Bool) {
+        childBeginAppearanceTransition(currentPage, isAppearing: true, animated: animated)
+        
+        let animationBlock = {
+            self.tabView.collectionView.collectionViewLayout.invalidateLayout()
+            self.tabView.panToPercentage(self.scrolledPercentage)
+        }
+        
+        guard let transitionCoordinator = transitionCoordinator else {
+            animationBlock()
+            return;
+        }
+        
+        transitionCoordinator.animate(alongsideTransition: { context in
+            animationBlock()
+        }, completion: nil)
+    }
+
     open override var shouldAutomaticallyForwardAppearanceMethods : Bool {
         // In order to send child view controllers the view(Will/Did)(Appear/Disappear) calls at the 
         // correct times and only when the view controller is visible, we will fully control the 
@@ -201,6 +221,25 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
         tabControllersView.contentOffset = CGPoint(x: CGFloat(currentPage) * tabControllersView.bounds.width, y: 0)
     }
 
+    func setLargestTabSize() {
+        largestTabSize = viewControllers.reduce(CGSize.zero) { (largestSize: CGSize, viewController: UIViewController) -> CGSize in
+            ScrollingTabController.sizingCell.title = viewController.tabBarItem.title
+            let size = ScrollingTabController.sizingCell.contentView.systemLayoutSizeFitting(UILayoutFittingCompressedSize)
+            return size.width > largestSize.width ? size : largestSize
+        }
+        
+        guard let dataSource = tabView.collectionView.dataSource else { return }
+        let width: CGFloat
+        let itemCount = dataSource.collectionView(tabView.collectionView, numberOfItemsInSection: 0)
+        if largestTabSize.width * CGFloat(itemCount) > tabView.collectionView.frame.width {
+            width = largestTabSize.width
+        } else {
+            width = tabView.collectionView.frame.width / CGFloat(itemCount)
+        }
+        tabView.setStartingIndicatorWidth(width: width)
+        tabView.collectionView.collectionViewLayout.invalidateLayout()
+    }
+    
     func configureViewControllers() {
         for item in items {
             let child = item.controller
@@ -332,25 +371,29 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
     
     open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
 
+        var size: CGSize = CGSize(width: 100.0, height: tabView.frame.height)
         switch tabSizing {
         case .fitViewFrameWidth, .fixedSize(_):
             if let flowLayout = collectionViewLayout as? UICollectionViewFlowLayout {
                 return flowLayout.itemSize
             }
+            
+        case .flexibleWidth:
+            guard let dataSource = collectionView.dataSource else { return size }
+            let itemCount = dataSource.collectionView(collectionView, numberOfItemsInSection: 0)
+            if largestTabSize.width * CGFloat(itemCount) > collectionView.frame.width {
+                size = largestTabSize;
+            } else {
+                let width = collectionView.frame.width / CGFloat(itemCount)
+                size = CGSize(width: width, height: tabView.frame.height)
+            }
+            
         case .sizeToContent:
-
-            ScrollingTabController.sizingCell.frame.size = CGSize(width: 9999.0, height: tabView.frame.height)
-            ScrollingTabController.sizingCell.contentView.frame = ScrollingTabController.sizingCell.bounds
-            
-            ScrollingTabController.sizingCell.title = viewControllers[(indexPath as NSIndexPath).row].tabBarItem.title
-            ScrollingTabController.sizingCell.layoutIfNeeded()
-            
-            let size = ScrollingTabController.sizingCell.contentView.systemLayoutSizeFitting(UILayoutFittingCompressedSize)
-
-            return CGSize(width: size.width, height: tabView.frame.height)
+            ScrollingTabController.sizingCell.title = viewControllers[indexPath.row].tabBarItem.title
+            size = ScrollingTabController.sizingCell.contentView.systemLayoutSizeFitting(UILayoutFittingCompressedSize)
         }
 
-        return CGSize(width: 100.0, height: tabView.frame.height)
+        return size
     }
     
     open func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -398,6 +441,9 @@ open class ScrollingTabController: UIViewController, UIScrollViewDelegate, UICol
             default:
                 break
             }
+            
+            //invalidateLayout during rotation so panToPercentage can put the marker in the right place
+            self.tabView.collectionView.collectionViewLayout.invalidateLayout()
 
             }, completion: { context in
                 self.updatingCurrentPage = true

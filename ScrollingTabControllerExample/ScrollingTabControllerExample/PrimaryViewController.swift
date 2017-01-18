@@ -27,14 +27,16 @@
 import UIKit
 import ScrollingTabController
 
-class ViewController: ScrollingTabController {
+class PrimaryViewController: ScrollingTabController {
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
         self.buildViewControllers()
         self.tabSizing = .sizeToContent
-        self.tabView.centerSelectTabs = true
+        
+        //Uncomment to see centerSelectTabs
+        //self.tabView.centerSelectTabs = true
 
         let nextBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(jumpAhead))
         let previousBarButtonItem = UIBarButtonItem(barButtonSystemItem: .rewind, target: self, action: #selector(jumpBack))

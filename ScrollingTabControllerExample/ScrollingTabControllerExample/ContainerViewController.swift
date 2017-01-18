@@ -15,34 +15,56 @@ class ContainerViewController: UIViewController {
     
     var viewControllers: [UIViewController] = []
     
-    @IBOutlet var scrollContainer: UIView!
+    @IBOutlet weak var scrollContainer: UIView!
+    @IBOutlet weak var scrollTabModeSegmentedControl: UISegmentedControl!
+    @IBOutlet weak var centerSelectSwitch: UISwitch!
+    @IBOutlet weak var numberOfViewsLabel: UILabel!
+    @IBOutlet weak var viewCountStepper: UIStepper!
+    
+    let tabSizingMapping: [ScrollingTabView.TabSizing] = [.fitViewFrameWidth, .fixedSize(200), .sizeToContent, .flexibleWidth]
+    var viewControllerCount = 5
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        scrollTab.delegate = self
-        
+
         buildViewControllers()
+        setupScrollTab()
+        // Do any additional setup after loading the view.
+        
+        setupScrollTabModeSegmentedControl()
+        viewCountStepper.value = Double(viewControllerCount)
+    }
+    
+    func setupScrollTabModeSegmentedControl() {
+        scrollTabModeSegmentedControl.removeAllSegments()
+        scrollTabModeSegmentedControl.insertSegment(withTitle: "fitViewFrameWidth", at: 0, animated: false)
+        scrollTabModeSegmentedControl.insertSegment(withTitle: "fixedSize(200)", at: 1, animated: false)
+        scrollTabModeSegmentedControl.insertSegment(withTitle: "sizeToContent", at: 2, animated: false)
+        scrollTabModeSegmentedControl.insertSegment(withTitle: "flexibleWidth", at: 3, animated: false)
+        
+        scrollTabModeSegmentedControl.selectedSegmentIndex = 0
+    }
+    
+    func setupScrollTab() {
+        scrollTab.delegate = self
         scrollTab.willMove(toParentViewController: self)
         addChildViewController(scrollTab)
         scrollTab.viewControllers = viewControllers
         scrollTab.view.translatesAutoresizingMaskIntoConstraints = false
-        
         scrollContainer.addSubview(scrollTab.view)
         scrollContainer.layoutIfNeeded()
-    
+        
         let horizontal = NSLayoutConstraint.constraints(withVisualFormat: "|[view]|", options: [], metrics: nil, views: ["view": scrollTab.view])
         let vertical = NSLayoutConstraint.constraints(withVisualFormat: "V:|[view]|", options: [], metrics: nil, views: ["view": scrollTab.view])
         NSLayoutConstraint.activate(horizontal + vertical)
         
         scrollTab.didMove(toParentViewController: self)
-        
-        scrollTab.tabView.tabSizing = .fitViewFrameWidth
-        scrollTab.selectTab(atIndex: 1, animated: false)
-        // Do any additional setup after loading the view.
+        scrollTab.centerSelectTabs = centerSelectSwitch.isOn
     }
-
+    
     func buildViewControllers() {
-        for i in 1...3 {
+        viewControllers.removeAll()
+        for i in 1...viewControllerCount {
             let viewController = TestingViewController()
             
             var color = UIColor.white
@@ -66,6 +88,27 @@ class ContainerViewController: UIViewController {
             
             viewControllers.append(viewController)
         }
+    }
+    
+    @IBAction func segmentedControlDidChange(_ segmentedControl: UISegmentedControl) {
+        let tabSizing = tabSizingMapping[segmentedControl.selectedSegmentIndex]
+        scrollTab.tabSizing = tabSizing
+        scrollTab.selectTab(atIndex: 0, animated: true)
+    }
+
+    @IBAction func centerSelectSwitchChanged(_ sender: UISwitch) {
+        scrollTab.centerSelectTabs = sender.isOn
+        scrollTab.selectTab(atIndex: 0, animated: true)
+    }
+    
+    @IBAction func stepperValueChanged(_ stepper: UIStepper) {
+        viewControllerCount = Int(stepper.value)
+        buildViewControllers()
+        scrollTab.view.removeFromSuperview()
+        scrollTab.removeFromParentViewController()
+        scrollTab = ScrollingTabController()
+        setupScrollTab()
+        scrollTab.selectTab(atIndex: 0, animated: true)
     }
 }
 
